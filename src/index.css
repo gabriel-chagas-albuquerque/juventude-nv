@@ -1,0 +1,112 @@
+@import "@fontsource-variable/geist";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .theme {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', sans-serif
+  }
+
+  :root {
+    /* Base - Dark by default for Juventude NV premium feel */
+    --background: oklch(0.12 0.01 260);
+    --foreground: oklch(0.96 0.005 90);
+
+    --card: oklch(0.17 0.015 260);
+    --card-foreground: oklch(0.96 0.005 90);
+
+    --popover: oklch(0.17 0.015 260);
+    --popover-foreground: oklch(0.96 0.005 90);
+
+    /* Primary: Fire Orange */
+    --primary: oklch(0.72 0.18 50);
+    --primary-foreground: oklch(0.10 0.01 260);
+
+    /* Secondary: Dark surface */
+    --secondary: oklch(0.22 0.02 260);
+    --secondary-foreground: oklch(0.96 0.005 90);
+
+    --muted: oklch(0.22 0.02 260);
+    --muted-foreground: oklch(0.65 0.01 260);
+
+    /* Accent: Cyan/Blue from NV logo text */
+    --accent: oklch(0.70 0.18 220);
+    --accent-foreground: oklch(0.10 0.01 260);
+
+    --destructive: oklch(0.577 0.245 27.325);
+
+    --border: oklch(0.28 0.02 260);
+    --input: oklch(0.28 0.02 260);
+    --ring: oklch(0.72 0.18 50);
+
+    --radius: 0.625rem;
+
+    --sidebar: oklch(0.15 0.015 260);
+    --sidebar-foreground: oklch(0.96 0.005 90);
+    --sidebar-primary: oklch(0.72 0.18 50);
+    --sidebar-primary-foreground: oklch(0.10 0.01 260);
+    --sidebar-accent: oklch(0.22 0.02 260);
+    --sidebar-accent-foreground: oklch(0.96 0.005 90);
+    --sidebar-border: oklch(0.28 0.02 260);
+    --sidebar-ring: oklch(0.72 0.18 50);
+  }
+
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    font-family: 'Geist Variable', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient-fire {
+    background: linear-gradient(135deg, #ff9a00 0%, #ff6600 50%, #ff3300 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #00bfff 0%, #0080ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-fire-gradient {
+    background: linear-gradient(135deg, #ff9a00 0%, #ff6600 60%, #ff3300 100%);
+  }
+
+  .bg-dark-surface {
+    background: oklch(0.17 0.015 260);
+  }
+
+  .glow-orange {
+    box-shadow: 0 0 30px oklch(0.72 0.18 50 / 0.3), 0 0 60px oklch(0.72 0.18 50 / 0.15);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px -5px oklch(0.70 0.18 220 / 0.4);
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0.7) 50%,
+      var(--background) 100%
+    );
+  }
+}
