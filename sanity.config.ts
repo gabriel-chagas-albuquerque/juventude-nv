@@ -6,8 +6,8 @@ export default defineConfig({
   name: 'default',
   title: 'Juventude NV Admin',
 
-  projectId: '1mpxey5n',
-  dataset: 'production',
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID!,
+  dataset: import.meta.env.VITE_SANITY_DATASET!,
 
   plugins: [deskTool()],
 
