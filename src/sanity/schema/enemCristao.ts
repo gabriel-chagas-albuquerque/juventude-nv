@@ -46,13 +46,5 @@ export const enemCristao = defineType({
       type: 'file',
       title: 'Arquivo do Edital (PDF)',
     }),
-    defineField({
-      name: 'coverImage',
-      type: 'image',
-      title: 'Imagem de Capa',
-      options: {
-        hotspot: true,
-      },
-    }),
   ],
 });
