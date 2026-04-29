@@ -80,7 +80,7 @@ export default function FormPage() {
       setQuestions([]);
       setLoadingQuestions(true);
       setDynamicErrors({}); // Limpar erros dinâmicos
-      
+
       try {
         const data = await client.fetch(FORM_QUESTIONS_QUERY, { categoryId: selectedCategoryId });
         setQuestions(data);
@@ -98,7 +98,7 @@ export default function FormPage() {
     // 1. Validar campos dinâmicos manualmente de acordo com o Sanity
     const newErrors: Record<string, string> = {};
     const currentValues = watch('dynamic') || {};
-    
+
     questions.forEach((q) => {
       const value = currentValues[q.fieldName];
       if (q.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
@@ -116,7 +116,7 @@ export default function FormPage() {
 
     try {
       const categoryName = categories.find(c => c._id === selectedCategoryId)?.label || '';
-      
+
       // 2. Preparar dados consolidados para o Google Sheets
       const payload = {
         timestamp: new Date().toISOString(),
@@ -147,7 +147,7 @@ export default function FormPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center p-12 rounded-3xl border border-primary/20 bg-card/50 backdrop-blur-xl max-w-lg w-full glow-orange"
+          className="text-center p-12 rounded-3xl border border-border bg-card max-w-lg w-full shadow-xl"
         >
           <div className="relative inline-block mb-8">
             <motion.div
@@ -213,7 +213,7 @@ export default function FormPage() {
           </motion.p>
         </div>
 
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="border-border bg-card shadow-sm">
           <CardHeader>
             <CardTitle>Informações Gerais</CardTitle>
             <CardDescription>Preencha seus dados básicos para começarmos.</CardDescription>

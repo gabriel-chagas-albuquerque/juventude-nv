@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Tv, Share2 } from 'lucide-react';
+import { Instagram, Youtube, MessageCircle } from 'lucide-react';
 import { client } from '@/lib/sanityClient';
 import { SITE_SETTINGS_QUERY } from '@/lib/queries';
 import type { SiteSettings } from '@/lib/types';
@@ -38,13 +38,15 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { label: 'Início', to: '/' },
-                { label: 'Formulário', to: '/formulario' },
+                { label: 'Sobre nós', to: '/sobre-nos' },
+                { label: 'Programação/Eventos', to: '/programacao' },
+                { label: 'Fale Conosco', to: '/inscricao' },
                 { label: 'ENEM Cristão', to: '/enem-cristao' },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                    className="text-muted-foreground hover:text-primary text-base transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -62,9 +64,10 @@ export default function Footer() {
                   href={settings.socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-200"
+                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF8000] hover:border-[#FF8000] transition-all duration-200"
+                  title="Instagram"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <Instagram className="w-5 h-5" />
                 </a>
               )}
               {settings?.socialLinks?.youtube && (
@@ -72,12 +75,26 @@ export default function Footer() {
                   href={settings.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-200"
+                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF0000] hover:border-[#FF0000] transition-all duration-200"
+                  title="Youtube"
                 >
-                  <Tv className="w-4 h-4" />
+                  <Youtube className="w-5 h-5" />
                 </a>
               )}
-              {!settings?.socialLinks?.instagram && !settings?.socialLinks?.youtube && (
+              {settings?.socialLinks?.whatsapp && (
+                <a
+                  href={settings.socialLinks.whatsapp.startsWith('http') 
+                    ? settings.socialLinks.whatsapp 
+                    : `https://wa.me/${settings.socialLinks.whatsapp.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all duration-200"
+                  title="Whatsapp"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </a>
+              )}
+              {!settings?.socialLinks?.instagram && !settings?.socialLinks?.youtube && !settings?.socialLinks?.whatsapp && (
                 <p className="text-xs text-muted-foreground italic">Redes sociais em breve</p>
               )}
             </div>

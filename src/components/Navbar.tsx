@@ -9,7 +9,9 @@ import { useEffect } from 'react';
 
 const navLinks = [
   { label: 'Início', to: '/' },
-  { label: 'Formulário', to: '/formulario' },
+  { label: 'Sobre nós', to: '/sobre-nos' },
+  { label: 'Programação/Eventos', to: '/programacao' },
+  { label: 'Fale Conosco', to: '/inscricao' },
   { label: 'ENEM Cristão', to: '/enem-cristao' },
 ];
 
@@ -45,11 +47,10 @@ export default function Navbar() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                  }`}
+                  className={`relative px-4 py-2 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                    }`}
                 >
                   {link.label}
                   {isActive && (
@@ -92,11 +93,10 @@ export default function Navbar() {
                     key={link.to}
                     to={link.to}
                     onClick={() => setIsOpen(false)}
-                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                    }`}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                      }`}
                   >
                     {link.label}
                   </Link>

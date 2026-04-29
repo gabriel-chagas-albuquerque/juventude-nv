@@ -71,8 +71,8 @@ export default function EnemCristaoPage() {
       <section className="relative py-28 px-4 overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-20"
-            style={{ background: 'radial-gradient(ellipse, oklch(0.70 0.18 220 / 0.4) 0%, transparent 70%)' }}
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-10"
+            style={{ background: 'radial-gradient(ellipse, oklch(0.68 0.18 50 / 0.4) 0%, transparent 70%)' }}
           />
         </div>
 
@@ -153,27 +153,25 @@ export default function EnemCristaoPage() {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               {data?.editalUrl ? (
-                <a href={data.editalUrl} target="_blank" rel="noopener noreferrer" download>
+                <a 
+                  href={`${data.editalUrl}?dl=edital-enem-cristao.pdf`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
                   <Button
                     id="enem-download-edital"
                     size="lg"
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold glow-blue transition-all"
+                    className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white font-bold shadow-lg shadow-blue-500/20 px-8 transition-all hover:scale-105"
                   >
                     <Download className="w-5 h-5 mr-2" />
                     Baixar Edital (PDF)
                   </Button>
                 </a>
               ) : (
-                <Button
-                  id="enem-download-disabled"
-                  size="lg"
-                  disabled
-                  variant="outline"
-                  className="border-accent/30 text-muted-foreground"
-                >
-                  <Download className="w-5 h-5 mr-2" />
-                  Edital em breve
-                </Button>
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-muted/50 border border-dashed border-border text-muted-foreground font-medium animate-pulse">
+                  <Download className="w-4 h-4 opacity-50" />
+                  <span>Edital disponível em breve</span>
+                </div>
               )}
             </motion.div>
           )}
@@ -209,7 +207,7 @@ export default function EnemCristaoPage() {
               const Icon = feature.icon;
               return (
                 <motion.div key={feature.title} variants={itemVariants}>
-                  <Card className="h-full border-border/60 hover:border-accent/40 transition-all duration-300 group">
+                  <Card className="h-full bg-card border-border shadow-sm hover:border-accent/40 transition-all duration-300 group">
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
@@ -221,7 +219,7 @@ export default function EnemCristaoPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                      <p className="text-muted-foreground text-base leading-relaxed">{feature.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -317,26 +315,25 @@ export default function EnemCristaoPage() {
                 Baixe o edital, estude a Palavra de Deus e venha mostrar seu conhecimento bíblico!
               </p>
               {data?.editalUrl ? (
-                <a href={data.editalUrl} target="_blank" rel="noopener noreferrer" download>
+                <a 
+                  href={`${data.editalUrl}?dl=edital-enem-cristao.pdf`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
                   <Button
                     id="enem-final-cta"
                     size="lg"
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+                    className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white font-bold px-8 transition-all hover:scale-105"
                   >
                     <Download className="w-5 h-5 mr-2" />
-                    Baixar Edital
+                    Baixar Edital Agora
                   </Button>
                 </a>
               ) : (
-                <Button
-                  id="enem-final-cta-disabled"
-                  size="lg"
-                  disabled
-                  variant="outline"
-                  className="border-accent/30"
-                >
+                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-background/50 border border-dashed border-accent/30 text-muted-foreground font-medium">
+                  <Download className="w-4 h-4 opacity-40" />
                   Edital em breve
-                </Button>
+                </div>
               )}
             </div>
           </div>

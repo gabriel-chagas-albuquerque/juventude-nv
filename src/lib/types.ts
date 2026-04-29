@@ -1,26 +1,29 @@
 // Types for Sanity data
-export interface YouthUnit {
-  _id: string;
-  name: string;
-  address?: string;
-  leader?: string;
-  cultDays?: Array<{
-    day: string;
-    time: string;
-  }>;
-  whatsappLink?: string;
-  imageUrl?: string;
-}
-
 export interface ScheduleItem {
   _id: string;
   title: string;
-  eventDate?: string;
-  dayOfWeek: string;
+  tipoRecorrencia?: 'semanal' | 'mensal_dia' | 'mensal_ordinal' | 'unico';
+  diaDaSemana?: string;
+  ordemMensal?: string;
+  dataFixa?: string;
   time?: string;
   description?: string;
   location?: string;
   address?: string;
+}
+
+
+export interface AboutUsValue {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface AboutUs {
+  _id: string;
+  title: string;
+  description: string;
+  values: AboutUsValue[];
 }
 
 export interface FormCategory {
@@ -54,6 +57,7 @@ export interface EnemCristao {
   editalUrl?: string;
   coverImageUrl?: string;
 }
+
 export interface SiteSettings {
   title: string;
   slogan?: string;

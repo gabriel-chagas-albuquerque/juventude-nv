@@ -1,64 +1,93 @@
 import { defineType, defineField } from 'sanity';
 
 export const youthSchedule = defineType({
-  name: 'youthSchedule',
+  name: 'evento',
+  title: 'Programação/Eventos',
   type: 'document',
-  title: 'Programação',
   fields: [
     defineField({
-      name: 'title',
-      type: 'string',
+      name: 'titulo',
       title: 'Título do Evento',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'eventDate',
-      type: 'date',
-      title: 'Data do Evento',
-      description: 'Ex: 2026-05-15',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'dayOfWeek',
       type: 'string',
-      title: 'Dia da Semana',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'tipoRecorrencia',
+      title: 'Tipo de Recorrência',
+      type: 'string',
       options: {
         list: [
-          { title: 'Domingo', value: 'domingo' },
-          { title: 'Segunda-feira', value: 'segunda' },
-          { title: 'Terça-feira', value: 'terca' },
-          { title: 'Quarta-feira', value: 'quarta' },
-          { title: 'Quinta-feira', value: 'quinta' },
-          { title: 'Sexta-feira', value: 'sexta' },
-          { title: 'Sábado', value: 'sabado' },
+          { title: 'Semanal', value: 'semanal' },
+          { title: 'Mensal (Dia Fixo)', value: 'mensal_dia' },
+          { title: 'Mensal (Ordinal - ex: 3º Sábado)', value: 'mensal_ordinal' },
+          { title: 'Evento Único', value: 'unico' },
         ],
+        layout: 'radio',
       },
       validation: (Rule) => Rule.required(),
     }),
+    // Campo visível apenas se for Semanal (ex: Todo Domingo)
     defineField({
-      name: 'time',
+      name: 'diaDaSemana',
+      title: 'Dia da Semana',
       type: 'string',
+      hidden: ({ document }) => 
+        document?.tipoRecorrencia !== 'semanal' && document?.tipoRecorrencia !== 'mensal_ordinal',
+      options: {
+        list: [
+          { title: 'Domingo', value: '0' },
+          { title: 'Segunda', value: '1' },
+          { title: 'Terça', value: '2' },
+          { title: 'Quarta', value: '3' },
+          { title: 'Quinta', value: '4' },
+          { title: 'Sexta', value: '5' },
+          { title: 'Sábado', value: '6' },
+        ],
+      },
+    }),
+    // Campo para o "3º Sábado", "1ª Segunda", etc.
+    defineField({
+      name: 'ordemMensal',
+      title: 'Qual ocorrência no mês?',
+      type: 'string',
+      hidden: ({ document }) => document?.tipoRecorrencia !== 'mensal_ordinal',
+      options: {
+        list: [
+          { title: '1º', value: '1' },
+          { title: '2º', value: '2' },
+          { title: '3º', value: '3' },
+          { title: '4º', value: '4' },
+          { title: 'Último', value: 'last' },
+        ],
+      },
+    }),
+    // Campo para data de evento único ou dia fixo mensal
+    defineField({
+      name: 'dataFixa',
+      title: 'Data Específica ou Dia do Mês',
+      type: 'date',
+      hidden: ({ document }) => 
+        document?.tipoRecorrencia !== 'unico' && document?.tipoRecorrencia !== 'mensal_dia',
+      description: 'Para evento único (data completa) ou mensal dia fixo (apenas o dia será considerado).',
+    }),
+    defineField({
+      name: 'horario',
       title: 'Horário',
-      placeholder: 'Ex: 19:30',
+      type: 'string',
+      description: 'Ex: 19:30',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'location',
-      type: 'string',
-      title: 'Local (Nome)',
-      placeholder: 'Ex: Templo Central',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'address',
-      type: 'string',
-      title: 'Endereço Completo',
-      placeholder: 'Ex: Rua Exemplo, 123 - Centro',
-    }),
-    defineField({
-      name: 'description',
+      name: 'descricao',
+      title: 'Descrição/Líder',
       type: 'text',
-      title: 'Descrição',
+      rows: 3,
     }),
   ],
+  preview: {
+    select: {
+      title: 'titulo',
+      subtitle: 'horario',
+    },
+  },
 });

@@ -1,25 +1,17 @@
-// Youth Units
-export const YOUTH_UNITS_QUERY = `*[_type == "youthUnit"] | order(name asc) {
+// Schedule (Programação)
+export const SCHEDULE_QUERY = `*[_type == "evento"] | order(horario asc) {
   _id,
-  name,
-  address,
-  leader,
-  cultDays,
-  whatsappLink,
-  "imageUrl": image.asset->url
-}`;
-
-// Schedule
-export const SCHEDULE_QUERY = `*[_type == "youthSchedule"] {
-  _id,
-  title,
-  eventDate,
-  dayOfWeek,
-  time,
-  description,
+  "title": titulo,
+  tipoRecorrencia,
+  diaDaSemana,
+  ordemMensal,
+  dataFixa,
+  "time": horario,
+  "description": descricao,
   location,
   address
 }`;
+
 
 // Form Categories
 export const FORM_CATEGORIES_QUERY = `*[_type == "formCategory"] | order(order asc) {
@@ -52,12 +44,12 @@ export const ENEM_QUERY = `*[_type == "enemCristao"][0] {
 }`;
 // SITE SETTINGS
 export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
-  title,
-  slogan,
-  organizationName,
+  ...,
   "logoUrl": logo.asset->url,
   "heroImageUrl": heroImage.asset->url,
   socialLinks,
   contactInfo,
   footerText
 }`;
+
+export const ABOUT_US_QUERY = `*[_type == "aboutUs"][0]`;

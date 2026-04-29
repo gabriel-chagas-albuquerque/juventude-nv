@@ -10,47 +10,47 @@
   }
 
   :root {
-    /* Base - Dark by default for Juventude NV premium feel */
-    --background: oklch(0.12 0.01 260);
-    --foreground: oklch(0.96 0.005 90);
+    /* Base - Light Theme */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.2 0.01 260);
 
-    --card: oklch(0.17 0.015 260);
-    --card-foreground: oklch(0.96 0.005 90);
+    --card: oklch(0.98 0.005 260);
+    --card-foreground: oklch(0.2 0.01 260);
 
-    --popover: oklch(0.17 0.015 260);
-    --popover-foreground: oklch(0.96 0.005 90);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2 0.01 260);
 
-    /* Primary: Fire Orange */
-    --primary: oklch(0.72 0.18 50);
-    --primary-foreground: oklch(0.10 0.01 260);
+    /* Primary: Fire Orange (Ligeiramente ajustado para tema claro) */
+    --primary: oklch(0.68 0.18 50);
+    --primary-foreground: oklch(1 0 0);
 
-    /* Secondary: Dark surface */
-    --secondary: oklch(0.22 0.02 260);
-    --secondary-foreground: oklch(0.96 0.005 90);
+    /* Secondary: Light grey surface */
+    --secondary: oklch(0.95 0.01 260);
+    --secondary-foreground: oklch(0.2 0.01 260);
 
-    --muted: oklch(0.22 0.02 260);
-    --muted-foreground: oklch(0.65 0.01 260);
+    --muted: oklch(0.95 0.01 260);
+    --muted-foreground: oklch(0.45 0.02 260);
 
     /* Accent: Cyan/Blue from NV logo text */
-    --accent: oklch(0.70 0.18 220);
-    --accent-foreground: oklch(0.10 0.01 260);
+    --accent: oklch(0.65 0.15 220);
+    --accent-foreground: oklch(1 0 0);
 
     --destructive: oklch(0.577 0.245 27.325);
 
-    --border: oklch(0.28 0.02 260);
-    --input: oklch(0.28 0.02 260);
-    --ring: oklch(0.72 0.18 50);
+    --border: oklch(0.92 0.01 260);
+    --input: oklch(0.92 0.01 260);
+    --ring: oklch(0.68 0.18 50);
 
-    --radius: 0.625rem;
+    --radius: 1rem;
 
-    --sidebar: oklch(0.15 0.015 260);
-    --sidebar-foreground: oklch(0.96 0.005 90);
-    --sidebar-primary: oklch(0.72 0.18 50);
-    --sidebar-primary-foreground: oklch(0.10 0.01 260);
-    --sidebar-accent: oklch(0.22 0.02 260);
-    --sidebar-accent-foreground: oklch(0.96 0.005 90);
-    --sidebar-border: oklch(0.28 0.02 260);
-    --sidebar-ring: oklch(0.72 0.18 50);
+    --sidebar: oklch(0.98 0.005 260);
+    --sidebar-foreground: oklch(0.2 0.01 260);
+    --sidebar-primary: oklch(0.68 0.18 50);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.95 0.01 260);
+    --sidebar-accent-foreground: oklch(0.2 0.01 260);
+    --sidebar-border: oklch(0.92 0.01 260);
+    --sidebar-ring: oklch(0.68 0.18 50);
   }
 
   * {
@@ -102,11 +102,9 @@
   }
 
   .hero-overlay {
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.4) 0%,
-      rgba(0, 0, 0, 0.7) 50%,
-      var(--background) 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(0, 0, 0, 0.4) 0%,
+        rgba(0, 0, 0, 0.7) 50%,
+        var(--background) 100%);
   }
 }
