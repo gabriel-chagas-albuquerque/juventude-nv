@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { Instagram, Youtube, Phone } from 'lucide-react';
 import { client } from '@/lib/sanityClient';
 import { SITE_SETTINGS_QUERY } from '@/lib/queries';
 import type { SiteSettings } from '@/lib/types';
@@ -64,7 +64,7 @@ export default function Footer() {
                   href={settings.socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF8000] hover:border-[#FF8000] transition-all duration-200"
+                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF8000] hover:border-[#FF8000] transition-all duration-200 hover:scale-110"
                   title="Instagram"
                 >
                   <Instagram className="w-5 h-5" />
@@ -75,7 +75,7 @@ export default function Footer() {
                   href={settings.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF0000] hover:border-[#FF0000] transition-all duration-200"
+                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF0000] hover:border-[#FF0000] transition-all duration-200 hover:scale-110"
                   title="Youtube"
                 >
                   <Youtube className="w-5 h-5" />
@@ -88,10 +88,10 @@ export default function Footer() {
                     : `https://wa.me/${settings.socialLinks.whatsapp.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all duration-200"
+                  className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all duration-200 hover:scale-110"
                   title="Whatsapp"
                 >
-                  <MessageCircle className="w-5 h-5" />
+                  <Phone className="w-5 h-5" />
                 </a>
               )}
               {!settings?.socialLinks?.instagram && !settings?.socialLinks?.youtube && !settings?.socialLinks?.whatsapp && (
