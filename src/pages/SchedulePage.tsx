@@ -59,10 +59,10 @@ export default function SchedulePage() {
       return `${ORDINAL_LABELS[item.ordemMensal || ''] || ''} ${DAYS.find(d => d.id === item.diaDaSemana)?.label}`;
     }
     if (item.tipoRecorrencia === 'mensal_dia') {
-      return `Todo dia ${item.dataFixa ? new Date(item.dataFixa + 'T00:00:00').getDate() : ''}`;
+      return `Todo dia ${item.dataFixa ? new Date(item.dataFixa).getUTCDate() : ''}`;
     }
     if (item.tipoRecorrencia === 'unico') {
-      return item.dataFixa ? new Date(item.dataFixa + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data única';
+      return item.dataFixa ? new Date(item.dataFixa).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Data única';
     }
     return 'Semanal';
   };
@@ -199,9 +199,9 @@ export default function SchedulePage() {
                       <div className="h-10 w-10 rounded-xl bg-[#00AEEF]/10 flex items-center justify-center text-[#00AEEF] font-bold text-xs text-center leading-none">
                         {event.dataFixa ? (
                           <>
-                            {new Date(event.dataFixa + 'T00:00:00').getDate()}<br/>
+                            {new Date(event.dataFixa).getUTCDate()}<br/>
                             <span className="text-[8px] opacity-60">
-                              {new Date(event.dataFixa + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase()}
+                              {new Date(event.dataFixa).toLocaleDateString('pt-BR', { month: 'short', timeZone: 'UTC' }).toUpperCase()}
                             </span>
                           </>
                         ) : 'M'}
