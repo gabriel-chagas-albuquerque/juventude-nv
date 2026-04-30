@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { ClipboardList, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ClipboardList, Send, Loader2, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { sendToGoogleSheets } from '@/lib/googleSheets';
 
 // Esquema de validação básico
@@ -31,8 +31,9 @@ export default function FormPage() {
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [dynamicErrors, setDynamicErrors] = useState<Record<string, string>>({});
 
   const {
@@ -61,7 +62,7 @@ export default function FormPage() {
         const data = await client.fetch(FORM_CATEGORIES_QUERY);
         setCategories(data);
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        // Silently fail
       } finally {
         setLoadingCategories(false);
       }
@@ -85,7 +86,7 @@ export default function FormPage() {
         const data = await client.fetch(FORM_QUESTIONS_QUERY, { categoryId: selectedCategoryId });
         setQuestions(data);
       } catch (error) {
-        console.error('Error fetching questions:', error);
+        // Silently fail
       } finally {
         setLoadingQuestions(false);
       }
@@ -134,14 +135,18 @@ export default function FormPage() {
       };
 
       // 3. Enviar para o Google Sheets (Web App)
-      await sendToGoogleSheets(payload);
+      const result = await sendToGoogleSheets(payload);
 
-      setIsSubmitted(true);
-      reset();
-      setTimeout(() => setIsSubmitted(false), 5000);
+      if (result.success) {
+        setIsSubmitted(true);
+        reset();
+        setTimeout(() => setIsSubmitted(false), 5000);
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
-      console.error('Erro ao enviar para Google Sheets:', error);
-      alert('Erro ao enviar formulário. Por favor, tente novamente mais tarde.');
+      setSubmitError(true);
+      setTimeout(() => setSubmitError(false), 6000);
     } finally {
       setIsSubmitting(false);
     }
@@ -183,6 +188,49 @@ export default function FormPage() {
             onClick={() => setIsSubmitted(false)}
           >
             Enviar novo formulário
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (submitError) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center p-12 rounded-3xl border border-border bg-card max-w-lg w-full shadow-xl"
+        >
+          <div className="relative inline-block mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
+              className="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center mx-auto"
+            >
+              <XCircle className="w-12 h-12 text-red-500" />
+            </motion.div>
+            <motion.div
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0, 0.3, 0],
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 bg-red-500/30 rounded-full -z-10"
+            />
+          </div>
+          <h2 className="text-4xl font-extrabold mb-4 text-red-500">Ops! Algo deu errado.</h2>
+          <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+            Não foi possível completar o envio do formulário no momento.
+          </p>
+          <Button
+            size="lg"
+            variant="outline"
+            className="w-full h-14 text-lg border-red-500/50 hover:bg-red-500/10 text-red-500 font-bold"
+            onClick={() => setSubmitError(false)}
+          >
+            Tentar novamente
           </Button>
         </motion.div>
       </div>

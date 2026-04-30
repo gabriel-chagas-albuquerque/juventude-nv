@@ -36,7 +36,7 @@ export default function SchedulePage() {
         setSchedule(data);
         setLoading(false);
       })
-      .catch(console.error);
+      .catch(() => {});
   }, []);
 
   // Filter events for the active weekday

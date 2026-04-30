@@ -25,8 +25,7 @@ export default function AboutUs() {
         setContent(data);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error('Error fetching about us:', err);
+      .catch(() => {
         setLoading(false);
       });
   }, []);

@@ -22,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     client.fetch(SITE_SETTINGS_QUERY)
       .then(setSettings)
-      .catch(console.error);
+      .catch(() => {});
   }, []);
 
   const navCards = [
