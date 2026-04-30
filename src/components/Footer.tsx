@@ -16,8 +16,7 @@ export default function Footer() {
     <footer className="border-t border-border/50 bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Brand */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
                 <img src={settings?.logoUrl || "/src/assets/logo.png"} alt="Logo" className="w-full h-full object-cover" />
@@ -27,15 +26,15 @@ export default function Footer() {
                 <span className="text-gradient-blue">{settings?.title?.split(' ').slice(1).join(' ') || "NV"}</span>
               </span>
             </div>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-xs text-center md:text-left">
               {settings?.footerText || "Juventude da Igreja Assembleia de Deus Novo Viver. Transformando vidas pelo poder de Cristo e impactando gerações."}
             </p>
           </div>
 
           {/* Links */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold text-sm text-foreground mb-4">Navegação</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 text-center md:text-left">
               {[
                 { label: 'Início', to: '/' },
                 { label: 'Sobre nós', to: '/sobre-nos' },
@@ -56,9 +55,9 @@ export default function Footer() {
           </div>
 
           {/* Social */}
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold text-sm text-foreground mb-4">Redes Sociais</h3>
-            <div className="flex gap-3">
+            <div className="flex gap-3 justify-center md:justify-start">
               {settings?.socialLinks?.instagram && (
                 <a
                   href={settings.socialLinks.instagram}

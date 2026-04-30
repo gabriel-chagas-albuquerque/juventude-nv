@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
+import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 import Home from '@/pages/Home';
 import FormPage from '@/pages/FormPage';
@@ -11,6 +12,7 @@ import SchedulePage from '@/pages/SchedulePage';
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1">

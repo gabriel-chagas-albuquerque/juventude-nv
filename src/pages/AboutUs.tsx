@@ -59,7 +59,7 @@ export default function AboutUs() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-6">
+          <h1 className="text-3xl sm:text-5xl font-extrabold mb-6 leading-tight">
             {displayTitle.split(' ').map((word, i) => (
               <span key={i} className={i === displayTitle.split(' ').length - 1 ? "text-gradient-fire" : ""}>
                 {word}{' '}
@@ -80,13 +80,13 @@ export default function AboutUs() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-card p-8 rounded-3xl border border-border shadow-sm text-center space-y-4 hover:border-primary/30 transition-colors"
+                className="bg-card p-6 sm:p-8 rounded-3xl border border-border shadow-sm text-center space-y-4 hover:border-primary/30 transition-colors"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto">
                   <IconComponent className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-bold text-xl">{value.title}</h3>
-                <p className="text-sm text-muted-foreground">{value.description}</p>
+                <h3 className="font-bold text-xl sm:text-2xl">{value.title}</h3>
+                <p className="text-base text-muted-foreground">{value.description}</p>
               </motion.div>
             );
           })}

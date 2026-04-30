@@ -93,7 +93,7 @@ export default function Navbar() {
                     key={link.to}
                     to={link.to}
                     onClick={() => setIsOpen(false)}
-                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                    className={`px-4 py-4 rounded-xl text-lg font-semibold transition-colors ${isActive
                       ? 'bg-primary/10 text-primary'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                       }`}

@@ -77,13 +77,13 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center mb-6"
           >
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-6 text-center sm:text-left">
                 <img
                   src={'./letreiro-juventude-nv.png'}
                   alt="Logo"
-                  className="w-36 h-36 sm:w-48 sm:h-48 object-contain"
+                  className="w-32 h-32 sm:w-48 sm:h-48 object-contain drop-shadow-xl"
                 />
-              <h1 className="text-5xl sm:text-8xl font-black tracking-tighter drop-shadow-2xl leading-none">
+              <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black tracking-tighter drop-shadow-2xl leading-none">
                 <span className="text-[#FF8000]">Juventude</span> <span className="text-[#00AEEF]">NV</span>
               </h1>
             </div>
@@ -154,7 +154,7 @@ export default function Home() {
                       <ChevronRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                     </h3>
 
-                    <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+                    <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed">
                       {card.description}
                     </p>
                   </div>

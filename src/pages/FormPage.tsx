@@ -199,7 +199,7 @@ export default function FormPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold"
+            className="text-3xl sm:text-5xl font-bold leading-tight"
           >
             Formulários de <span className="text-primary">Conexão</span>
           </motion.h1>
@@ -214,11 +214,11 @@ export default function FormPage() {
         </div>
 
         <Card className="border-border bg-card shadow-sm">
-          <CardHeader>
-            <CardTitle>Informações Gerais</CardTitle>
-            <CardDescription>Preencha seus dados básicos para começarmos.</CardDescription>
+          <CardHeader className="p-6 sm:p-8">
+            <CardTitle className="text-xl sm:text-2xl">Informações Gerais</CardTitle>
+            <CardDescription className="text-sm sm:text-base">Preencha seus dados básicos para começarmos.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 sm:p-8 pt-0 sm:pt-0">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">

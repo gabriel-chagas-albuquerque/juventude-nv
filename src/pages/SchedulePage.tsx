@@ -75,7 +75,7 @@ export default function SchedulePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-4xl sm:text-6xl font-black mb-6 tracking-tight">
+          <h1 className="text-3xl sm:text-6xl font-black mb-6 tracking-tight leading-tight">
             Programação <span className="text-[#FF8000]">& Eventos</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
