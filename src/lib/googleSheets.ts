@@ -14,13 +14,19 @@ export async function sendToGoogleSheets(data: any) {
   try {
     // Usamos text/plain para evitar problemas de CORS/Pre-flight com o Google Apps Script
     // O Script receberá isso e fará o JSON.parse normalmente
+    const payload = {
+      ...data,
+      timestamp: new Date().toISOString(),
+      token: import.meta.env.VITE_FORM_TOKEN as string
+    };
+
     await fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors', 
       headers: {
         'Content-Type': 'text/plain',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
 
     // Como usamos no-cors, o fetch sempre "falha" em ler a resposta (opaque response),

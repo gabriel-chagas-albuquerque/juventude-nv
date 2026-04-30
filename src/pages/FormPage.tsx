@@ -117,14 +117,20 @@ export default function FormPage() {
     try {
       const categoryName = categories.find(c => c._id === selectedCategoryId)?.label || '';
 
-      // 2. Preparar dados consolidados para o Google Sheets
+      // 2. Mapeamento Estrito (Apenas campos definidos no Sanity)
+      const sanitizedDynamicData: Record<string, any> = {};
+      questions.forEach(q => {
+        if (currentValues[q.fieldName] !== undefined) {
+          sanitizedDynamicData[q.fieldName] = currentValues[q.fieldName];
+        }
+      });
+
       const payload = {
-        timestamp: new Date().toISOString(),
         name: data.name,
         email: data.email,
         phone: data.phone,
         category: categoryName,
-        ...currentValues // Inclui todas as respostas das perguntas dinâmicas
+        ...sanitizedDynamicData
       };
 
       // 3. Enviar para o Google Sheets (Web App)
