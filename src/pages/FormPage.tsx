@@ -36,7 +36,7 @@ const baseSchema = z.object({
       return digits.length >= 10 && digits.length <= 11;
     }, 'Telefone incompleto. Digite o DDD e todos os números.'),
   categoryId: z.string().min(1, 'Selecione o tipo de formulário'),
-});
+}).passthrough();
 
 export default function FormPage() {
   const navigate = useNavigate();
@@ -62,8 +62,7 @@ export default function FormPage() {
       name: '',
       email: '',
       phone: '',
-      categoryId: '',
-      dynamic: {}
+      categoryId: ''
     }
   });
 
@@ -93,19 +92,36 @@ export default function FormPage() {
     fetchCategories();
   }, [categoriaParam, setValue]);
 
+  // Limpa campos dinâmicos ao trocar de categoria para evitar vazamento de dados
+  useEffect(() => {
+    if (selectedCategoryId) {
+      const currentValues = watch();
+      const baseFields = ['name', 'email', 'phone', 'categoryId'];
+      const newValues: any = {};
+      
+      baseFields.forEach(field => {
+        newValues[field] = currentValues[field] || '';
+      });
+      
+      reset(newValues);
+    }
+  }, [selectedCategoryId, reset]);
+
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
 
     try {
-      const categoryName = currentCategory?.label || '';
-      const dynamicValues = data.dynamic || {};
+      // Busca a categoria pelo _id (que é o que está no Select)
+      const categoryObj = categories.find(c => c._id === data.categoryId);
+      const categoryName = categoryObj?.label || 'Geral';
+      
+      // Remove campos internos e prepara o payload
+      const { categoryId, ...formData } = data;
 
       const payload = {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
+        ...formData,
         category: categoryName,
-        ...dynamicValues
+        timestamp: new Date().toISOString(),
       };
 
       // 3. Enviar para o Google Sheets (Web App)
@@ -385,12 +401,13 @@ export default function FormPage() {
                         className="space-y-6"
                       >
                         {currentQuestions.map((q) => {
-                          const fieldId = q.fieldName.current;
+                          // Fallback caso o slug não esteja preenchido no Sanity
+                          const fieldId = q.fieldName?.current || q.question.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
                           
                           return (
                             <div key={fieldId} className="space-y-2">
                               <Controller
-                                name={`dynamic.${fieldId}`}
+                                name={fieldId}
                                 control={control}
                                 rules={{ 
                                   required: q.required ? "Este campo é obrigatório" : false 
@@ -418,6 +435,7 @@ export default function FormPage() {
                                       {q.fieldType === 'textarea' ? (
                                         <Textarea
                                           {...field}
+                                          value={field.value ?? ''}
                                           id={fieldId}
                                           placeholder={q.placeholder || "Digite aqui..."}
                                           onChange={handleChange}
@@ -429,6 +447,7 @@ export default function FormPage() {
                                       ) : (
                                         <Input
                                           {...field}
+                                          value={field.value ?? ''}
                                           id={fieldId}
                                           type={q.fieldType === 'number' ? 'number' : 'text'}
                                           placeholder={q.placeholder || (q.fieldType === 'date' ? "DD/MM/AAAA" : "Digite aqui...")}
