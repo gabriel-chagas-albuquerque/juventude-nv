@@ -59,7 +59,7 @@ export default function AboutUs() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-3xl sm:text-5xl font-extrabold mb-6 leading-tight">
-            {displayTitle.split(' ').map((word, i) => (
+            {displayTitle.split(' ').map((word: string, i: number) => (
               <span key={i} className={i === displayTitle.split(' ').length - 1 ? "text-gradient-fire" : ""}>
                 {word}{' '}
               </span>
@@ -71,7 +71,7 @@ export default function AboutUs() {
         </motion.div>
 
         <div className="grid sm:grid-cols-3 gap-8 mt-16">
-          {displayValues.map((value, index) => {
+          {displayValues.map((value: any, index: number) => {
             const IconComponent = iconMap[value.icon] || Users;
             return (
               <motion.div

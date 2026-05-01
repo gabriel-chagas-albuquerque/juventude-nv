@@ -24,11 +24,35 @@ export interface SiteSettings {
   heroSubtitle: string;
   heroImageUrl?: string;
   logoUrl?: string;
+  footerText?: string;
   organizationName?: string;
   socialLinks?: {
-    platform: string;
-    url: string;
+    instagram?: string;
+    youtube?: string;
+    whatsapp?: string;
+  };
+}
+
+export interface AboutUs {
+  title: string;
+  description: string;
+  values: {
+    title: string;
+    description: string;
+    icon: string;
   }[];
+}
+
+export interface ScheduleItem {
+  _id: string;
+  title: string;
+  description?: string;
+  time?: string;
+  location?: string;
+  diaDaSemana?: string;
+  tipoRecorrencia: 'semanal' | 'mensal_ordinal' | 'mensal_dia' | 'unico';
+  ordemMensal?: string;
+  dataFixa?: string;
 }
 
 export interface EnemCristao {
