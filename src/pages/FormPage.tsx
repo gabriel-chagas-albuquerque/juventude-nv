@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn, maskPhone, maskCPF, maskDate } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useForm, Controller } from 'react-hook-form';
@@ -40,6 +40,8 @@ const baseSchema = z.object({
 
 export default function FormPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const categoriaParam = searchParams.get('categoria');
   const [categories, setCategories] = useState<FormCategory[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -53,6 +55,7 @@ export default function FormPage() {
     control,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<any>({
     resolver: zodResolver(baseSchema),
     defaultValues: {
@@ -73,6 +76,14 @@ export default function FormPage() {
       try {
         const data = await client.fetch(FORM_CATEGORIES_QUERY);
         setCategories(data);
+        
+        // Auto-select category if param matches identifier
+        if (categoriaParam && data.length > 0) {
+          const matched = data.find((c: any) => c.identifier === categoriaParam);
+          if (matched) {
+            setValue('categoryId', matched._id);
+          }
+        }
       } catch (error) {
         // Silently fail
       } finally {
@@ -80,7 +91,7 @@ export default function FormPage() {
       }
     }
     fetchCategories();
-  }, []);
+  }, [categoriaParam, setValue]);
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);

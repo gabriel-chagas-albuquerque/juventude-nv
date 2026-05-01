@@ -65,12 +65,14 @@ export default function Home() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
-    client.fetch(SITE_SETTINGS_QUERY)
+    client.fetch<SiteSettings>(SITE_SETTINGS_QUERY)
       .then(setSettings)
       .catch((err) => {
         console.error("Erro ao carregar configurações:", err);
       });
   }, []);
+
+  const home = settings?.home;
 
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-hidden">
@@ -78,9 +80,9 @@ export default function Home() {
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
         {/* Cinematic background */}
         <div className="absolute inset-0 z-0">
-          {settings?.heroImageUrl && (
+          {home?.heroImageUrl && (
             <img
-              src={settings.heroImageUrl}
+              src={home.heroImageUrl}
               alt="Background"
               className="w-full h-full object-cover opacity-100"
             />
@@ -104,15 +106,20 @@ export default function Home() {
                   className="w-32 h-32 sm:w-48 sm:h-48 object-contain drop-shadow-xl"
                 />
               <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black tracking-tighter drop-shadow-2xl leading-none">
-                <span className="text-[#FF8000]">Juventude</span> <span className="text-[#00AEEF]">NV</span>
+                <span className="text-[#FF8000]">
+                  {home?.title?.split(' ')[0] || "Juventude"}
+                </span>{' '}
+                <span className="text-[#00AEEF]">
+                  {home?.title?.split(' ').slice(1).join(' ') || "NV"}
+                </span>
               </h1>
             </div>
 
-            {/* Social Icons with Conditionals */}
+            {/* Social Icons */}
             <div className="flex gap-4 mb-8">
-              {Array.isArray(settings?.socialLinks) && settings.socialLinks.find(l => l.platform === 'instagram')?.url && (
+              {home?.socialLinks?.instagram && (
                 <a
-                  href={settings.socialLinks.find(l => l.platform === 'instagram')?.url}
+                  href={home.socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-full bg-white/10 border border-white/20 text-white hover:bg-[#FF8000] hover:border-[#FF8000] transition-all duration-300 hover:scale-110"
@@ -121,9 +128,9 @@ export default function Home() {
                   <Instagram size={24} />
                 </a>
               )}
-              {Array.isArray(settings?.socialLinks) && settings.socialLinks.find(l => l.platform === 'youtube')?.url && (
+              {home?.socialLinks?.youtube && (
                 <a
-                  href={settings.socialLinks.find(l => l.platform === 'youtube')?.url}
+                  href={home.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-full bg-white/10 border border-white/20 text-white hover:bg-[#FF0000] hover:border-[#FF0000] transition-all duration-300 hover:scale-110"
@@ -132,25 +139,19 @@ export default function Home() {
                   <Youtube size={24} />
                 </a>
               )}
-              {(() => {
-                const whatsapp = Array.isArray(settings?.socialLinks) 
-                  ? settings.socialLinks.find(l => l.platform === 'whatsapp')?.url 
-                  : null;
-                if (!whatsapp) return null;
-                return (
-                  <a
-                    href={whatsapp.startsWith('http') 
-                      ? whatsapp 
-                      : `https://wa.me/${whatsapp.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 rounded-full bg-white/10 border border-white/20 text-white hover:bg-[#25D366] hover:border-[#25D366] transition-all duration-300 hover:scale-110"
-                    title="Whatsapp"
-                  >
-                    <Phone size={24} />
-                  </a>
-                );
-              })()}
+              {home?.socialLinks?.whatsapp && (
+                <a
+                  href={home.socialLinks.whatsapp.startsWith('http') 
+                    ? home.socialLinks.whatsapp 
+                    : `https://wa.me/${home.socialLinks.whatsapp.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-full bg-white/10 border border-white/20 text-white hover:bg-[#25D366] hover:border-[#25D366] transition-all duration-300 hover:scale-110"
+                  title="Whatsapp"
+                >
+                  <Phone size={24} />
+                </a>
+              )}
             </div>
           </motion.div>
 
@@ -198,7 +199,7 @@ export default function Home() {
           className="absolute bottom-8 left-0 right-0 text-center"
         >
           <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.4em] text-white/50">
-            {settings?.organizationName || "Assembleia de Deus Novo Viver"}
+            {home?.organizationName || "Assembleia de Deus Novo Viver"}
           </span>
         </motion.div>
       </section>

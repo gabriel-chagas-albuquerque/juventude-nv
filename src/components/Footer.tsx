@@ -19,15 +19,15 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
-                <img src={settings?.logoUrl || "/src/assets/logo.png"} alt="Logo" className="w-full h-full object-cover" />
+                <img src={settings?.home?.logoUrl || "/src/assets/logo.png"} alt="Logo" className="w-full h-full object-cover" />
               </div>
               <span className="font-bold text-xl tracking-tight">
-                <span className="text-foreground">{settings?.title?.split(' ')[0] || "Juventude"}</span>{' '}
-                <span className="text-gradient-blue">{settings?.title?.split(' ').slice(1).join(' ') || "NV"}</span>
+                <span className="text-foreground">{settings?.home?.title?.split(' ')[0] || "Juventude"}</span>{' '}
+                <span className="text-gradient-blue">{settings?.home?.title?.split(' ').slice(1).join(' ') || "NV"}</span>
               </span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs text-center md:text-left">
-              {settings?.footerText || "Juventude da Igreja Assembleia de Deus Novo Viver. Transformando vidas pelo poder de Cristo e impactando gerações."}
+              {settings?.home?.footerText || "Juventude da Igreja Assembleia de Deus Novo Viver. Transformando vidas pelo poder de Cristo e impactando gerações."}
             </p>
           </div>
 
@@ -58,9 +58,9 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start">
             <h3 className="font-semibold text-sm text-foreground mb-4">Redes Sociais</h3>
             <div className="flex gap-3 justify-center md:justify-start">
-              {settings?.socialLinks?.instagram && (
+              {settings?.home?.socialLinks?.instagram && (
                 <a
-                  href={settings.socialLinks.instagram}
+                  href={settings.home.socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF8000] hover:border-[#FF8000] transition-all duration-200 hover:scale-110"
@@ -69,9 +69,9 @@ export default function Footer() {
                   <Instagram className="w-5 h-5" />
                 </a>
               )}
-              {settings?.socialLinks?.youtube && (
+              {settings?.home?.socialLinks?.youtube && (
                 <a
-                  href={settings.socialLinks.youtube}
+                  href={settings.home.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#FF0000] hover:border-[#FF0000] transition-all duration-200 hover:scale-110"
@@ -80,11 +80,11 @@ export default function Footer() {
                   <Youtube className="w-5 h-5" />
                 </a>
               )}
-              {settings?.socialLinks?.whatsapp && (
+              {settings?.home?.socialLinks?.whatsapp && (
                 <a
-                  href={settings.socialLinks.whatsapp.startsWith('http') 
-                    ? settings.socialLinks.whatsapp 
-                    : `https://wa.me/${settings.socialLinks.whatsapp.replace(/\D/g, '')}`}
+                  href={settings.home.socialLinks.whatsapp.startsWith('http') 
+                    ? settings.home.socialLinks.whatsapp 
+                    : `https://wa.me/${settings.home.socialLinks.whatsapp.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-[#25D366] hover:border-[#25D366] transition-all duration-200 hover:scale-110"
@@ -93,7 +93,7 @@ export default function Footer() {
                   <Phone className="w-5 h-5" />
                 </a>
               )}
-              {!settings?.socialLinks?.instagram && !settings?.socialLinks?.youtube && !settings?.socialLinks?.whatsapp && (
+              {!settings?.home?.socialLinks?.instagram && !settings?.home?.socialLinks?.youtube && !settings?.home?.socialLinks?.whatsapp && (
                 <p className="text-xs text-muted-foreground italic">Redes sociais em breve</p>
               )}
             </div>
@@ -102,7 +102,7 @@ export default function Footer() {
 
         <div className="border-t border-border/50 mt-8 pt-6 text-center">
           <p className="text-muted-foreground text-xs">
-            © {new Date().getFullYear()} {settings?.title || "Juventude NV"} — {settings?.organizationName || "Assembleia de Deus Novo Viver"}
+            © {new Date().getFullYear()} {settings?.home?.title || "Juventude NV"} — {settings?.home?.organizationName || "Assembleia de Deus Novo Viver"}
           </p>
         </div>
       </div>

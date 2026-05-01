@@ -17,7 +17,7 @@ export const SCHEDULE_QUERY = `*[_type == "evento"] | order(horario asc) {
 export const FORM_CATEGORIES_QUERY = `*[_type == "formCategory"] | order(label asc) {
   _id,
   label,
-  identifier,
+  "identifier": value.current,
   questions[] {
     question,
     fieldName,
@@ -38,24 +38,53 @@ export const FORM_QUESTIONS_QUERY = `*[_type == "formQuestion" && $categoryId in
 }`;
 
 // ENEM Cristao
-export const ENEM_QUERY = `*[_type == "enemCristao"][0] {
-  _id,
+export const ENEM_QUERY = `*[_type == "siteSettings"][0].enemCristao {
+  badge,
   title,
   subtitle,
   description,
+  features,
   eventDate,
   prizes,
   "editalUrl": editalFile.asset->url,
-  "coverImageUrl": coverImage.asset->url
-}`;
-// SITE SETTINGS
-export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
-  ...,
-  "logoUrl": logo.asset->url,
-  "heroImageUrl": heroImage.asset->url,
-  socialLinks,
-  contactInfo,
-  footerText
+  ctaText,
+  ctaButtonText
 }`;
 
-export const ABOUT_US_QUERY = `*[_type == "aboutUs"][0]`;
+// SITE SETTINGS (FULL DOCUMENT)
+export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
+  home {
+    title,
+    slogan,
+    organizationName,
+    "logoUrl": logo.asset->url,
+    "heroImageUrl": heroImage.asset->url,
+    socialLinks,
+    contactInfo,
+    footerText
+  },
+  aboutUs {
+    title,
+    description,
+    values
+  },
+  enemCristao {
+    badge,
+    title,
+    subtitle,
+    description,
+    features,
+    eventDate,
+    prizes,
+    "editalUrl": editalFile.asset->url,
+    ctaText,
+    ctaButtonText
+  }
+}`;
+
+// ABOUT US (Legacy/Specific - can be removed or kept if needed)
+export const ABOUT_US_QUERY = `*[_type == "siteSettings"][0].aboutUs {
+  title,
+  description,
+  values
+}`;

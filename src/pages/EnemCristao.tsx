@@ -1,90 +1,124 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  BookOpen,
-  Trophy,
-  Download,
-  CalendarDays,
+import { 
+  BookOpen, 
+  CalendarDays, 
+  Trophy, 
+  Target, 
+  Users, 
   Sparkles,
-  GraduationCap,
+  Download,
+  GraduationCap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { client } from '@/lib/sanityClient';
 import { ENEM_QUERY } from '@/lib/queries';
-import type { EnemCristao } from '@/lib/types';
+import type { EnemCristao, EnemFeature } from '@/lib/types';
+import { PortableText } from '@portabletext/react';
+
+const MEDAL_COLORS = [
+  'from-yellow-400 to-yellow-600', // Gold
+  'from-slate-300 to-slate-500',   // Silver
+  'from-amber-600 to-amber-800',   // Bronze
+];
+
+// Map string names from Sanity to Lucide Components
+const ICON_MAP: Record<string, any> = {
+  BookOpen,
+  CalendarDays,
+  Trophy,
+  Target,
+  Users,
+  Sparkles,
+  GraduationCap
+};
+
+const FALLBACK_FEATURES: EnemFeature[] = [
+  {
+    title: 'Estudo Bíblico',
+    description: 'Incentivo ao estudo sistemático e profundo das Escrituras Sagradas.',
+    icon: 'BookOpen',
+  },
+  {
+    title: 'Prova Aplicada',
+    description: 'Avaliação de conhecimentos em formato dinâmico e desafiador.',
+    icon: 'Target',
+  },
+  {
+    title: 'Comunhão',
+    description: 'Um momento de reunir a juventude em torno da Palavra.',
+    icon: 'Users',
+  },
+  {
+    title: 'Premiação',
+    description: 'Reconhecimento para aqueles que se destacarem na dedicação.',
+    icon: 'Trophy',
+  },
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-} as const;
-
-const MEDAL_COLORS = [
-  'from-yellow-400 to-yellow-600',
-  'from-gray-300 to-gray-500',
-  'from-orange-400 to-orange-700',
-];
-
-const STATIC_FEATURES = [
-  {
-    icon: BookOpen,
-    title: 'Estudo Bíblico',
-    description: 'Aprofunde seu conhecimento nas Escrituras de forma estruturada e competitiva.',
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
   },
-  {
-    icon: GraduationCap,
-    title: 'Prova Aplicada',
-    description: 'Uma prova desafiadora sobre as passagens bíblicas previamente divulgadas no edital.',
-  },
-  {
-    icon: Trophy,
-    title: 'Premiações',
-    description: 'Os melhores classificados recebem prêmios especiais preparados com carinho.',
-  },
-  {
-    icon: Sparkles,
-    title: 'Crescimento Espiritual',
-    description: 'Além do prêmio, você sai com um conhecimento mais sólido da Palavra de Deus.',
-  },
-];
+};
 
 export default function EnemCristaoPage() {
   const [data, setData] = useState<EnemCristao | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    client
-      .fetch<EnemCristao>(ENEM_QUERY)
-      .then((d) => setData(d))
-      .finally(() => setLoading(false));
+    async function fetchData() {
+      try {
+        const result = await client.fetch(ENEM_QUERY);
+        if (result) {
+          setData(result);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados do ENEM Cristão:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
   }, []);
 
+  const features = data?.features && data.features.length > 0 ? data.features : FALLBACK_FEATURES;
+
   return (
-    <div className="flex flex-col">
-      {/* ── Hero ── */}
-      <section className="relative py-28 px-4 overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-10"
-            style={{ background: 'radial-gradient(ellipse, oklch(0.68 0.18 50 / 0.4) 0%, transparent 70%)' }}
-          />
+    <main className="min-h-screen bg-background pt-24">
+      {/* ── Hero Section ── */}
+      <section className="relative py-20 px-4 overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full -z-10 opacity-30 blur-[100px] pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full bg-blue-500/20" />
+          <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-accent/20" />
         </div>
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center relative">
           <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7 }}
           >
             <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/30 rounded-full px-4 py-1.5 text-sm text-accent font-medium mb-6">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Iniciativa Juventude NV</span>
+              <span>{data?.badge || 'Iniciativa Juventude NV'}</span>
             </div>
           </motion.div>
 
@@ -102,21 +136,17 @@ export default function EnemCristaoPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1 }}
               >
-                {data?.title ? (
-                  <span className="text-gradient-blue">{data.title}</span>
-                ) : (
-                  <span className="text-gradient-blue">ENEM Cristão</span>
-                )}
+                <span className="text-gradient-blue">{data?.title || 'ENEM Cristão'}</span>
               </motion.h1>
 
-              {data?.subtitle && (
+              {(data?.subtitle || !data) && (
                 <motion.p
                   className="text-xl text-muted-foreground mb-6"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  {data.subtitle}
+                  {data?.subtitle || 'Desafiando você a conhecer mais da Palavra de Deus.'}
                 </motion.p>
               )}
 
@@ -192,9 +222,15 @@ export default function EnemCristaoPage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-3">
               O que é o <span className="text-gradient-blue">ENEM Cristão</span>?
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Uma iniciativa da Juventude NV para incentivar o estudo aprofundado da Bíblia de forma dinâmica e com premiações para os melhores.
-            </p>
+            <div className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {data?.description ? (
+                <PortableText value={data.description} />
+              ) : (
+                <p>
+                  Uma iniciativa da Juventude NV para incentivar o estudo aprofundado da Bíblia de forma dinâmica e com premiações para os melhores.
+                </p>
+              )}
+            </div>
           </motion.div>
 
           <motion.div
@@ -204,10 +240,10 @@ export default function EnemCristaoPage() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            {STATIC_FEATURES.map((feature) => {
-              const Icon = feature.icon;
+            {features.map((feature, idx) => {
+              const Icon = ICON_MAP[feature.icon] || BookOpen;
               return (
-                <motion.div key={feature.title} variants={itemVariants}>
+                <motion.div key={idx} variants={itemVariants}>
                   <Card className="h-full bg-card border-border shadow-sm hover:border-accent/40 transition-all duration-300 group">
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-3">
@@ -297,49 +333,37 @@ export default function EnemCristaoPage() {
         </div>
       </section>
 
-      {/* ── Final CTA ── */}
-      <section className="py-20 px-4">
-        <motion.div
-          className="max-w-3xl mx-auto text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <div className="p-10 rounded-2xl border border-accent/30 bg-accent/5 glow-blue relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-transparent pointer-events-none" />
-            <div className="relative z-10">
-              <h2 className="text-3xl font-extrabold mb-3">
-                Pronto para o <span className="text-gradient-blue">desafio</span>?
-              </h2>
-              <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-                Baixe o edital, estude a Palavra de Deus e venha mostrar seu conhecimento bíblico!
-              </p>
-              {data?.editalUrl ? (
-                <a 
-                  href={`${data.editalUrl}?dl=edital-enem-cristao.pdf`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    id="enem-final-cta"
-                    size="lg"
-                    className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white font-bold px-8 transition-all hover:scale-105"
-                  >
-                    <Download className="w-5 h-5 mr-2" />
-                    Baixar Edital Agora
-                  </Button>
-                </a>
-              ) : (
-                <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-background/50 border border-dashed border-accent/30 text-muted-foreground font-medium">
-                  <Download className="w-4 h-4 opacity-40" />
-                  Edital em breve
-                </div>
-              )}
+      {/* ── Footer CTA ── */}
+      <section className="py-20 px-4 bg-accent/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="space-y-8"
+          >
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-accent/10 mb-2">
+              <Sparkles className="w-10 h-10 text-accent animate-pulse" />
             </div>
-          </div>
-        </motion.div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+              {data?.ctaText || 'Prepare-se para o maior desafio bíblico!'}
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-xl mx-auto">
+              Não fique de fora desta jornada de aprendizado e crescimento espiritual.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button
+                size="lg"
+                className="bg-accent hover:bg-accent/90 text-white font-bold h-14 px-10 rounded-2xl shadow-xl shadow-accent/20 transition-all hover:scale-105 active:scale-95"
+                onClick={() => window.location.href = '/fale-conosco?categoria=enem-cristao'}
+              >
+                {data?.ctaButtonText || 'Inscreva-se Agora'}
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       </section>
-    </div>
+    </main>
   );
 }

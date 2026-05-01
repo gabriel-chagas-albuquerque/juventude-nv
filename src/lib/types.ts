@@ -18,19 +18,26 @@ export interface FormCategory {
 }
 
 export interface SiteSettings {
-  title: string;
-  description: string;
-  heroTitle: string;
-  heroSubtitle: string;
-  heroImageUrl?: string;
-  logoUrl?: string;
-  footerText?: string;
-  organizationName?: string;
-  socialLinks?: {
-    instagram?: string;
-    youtube?: string;
-    whatsapp?: string;
+  home: {
+    title: string;
+    slogan?: string;
+    organizationName?: string;
+    logoUrl?: string;
+    heroImageUrl?: string;
+    socialLinks?: {
+      instagram?: string;
+      youtube?: string;
+      whatsapp?: string;
+    };
+    contactInfo?: {
+      address?: string;
+      phone?: string;
+      email?: string;
+    };
+    footerText?: string;
   };
+  aboutUs?: AboutUs;
+  enemCristao?: EnemCristao;
 }
 
 export interface AboutUs {
@@ -55,16 +62,24 @@ export interface ScheduleItem {
   dataFixa?: string;
 }
 
+export interface EnemFeature {
+  title: string;
+  description: string;
+  icon: string;
+}
+
 export interface EnemCristao {
-  _id: string;
+  badge?: string;
   title: string;
   subtitle?: string;
-  description: string;
+  description?: any; // Portable Text
   eventDate?: string;
+  features?: EnemFeature[];
   prizes?: {
     position: string;
     prize: string;
   }[];
   editalUrl?: string;
-  coverImageUrl?: string;
+  ctaText?: string;
+  ctaButtonText?: string;
 }
