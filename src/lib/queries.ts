@@ -14,11 +14,17 @@ export const SCHEDULE_QUERY = `*[_type == "evento"] | order(horario asc) {
 
 
 // Form Categories
-export const FORM_CATEGORIES_QUERY = `*[_type == "formCategory"] | order(order asc) {
+export const FORM_CATEGORIES_QUERY = `*[_type == "formCategory"] | order(label asc) {
   _id,
   label,
-  "value": value.current,
-  description
+  identifier,
+  questions[] {
+    question,
+    fieldName,
+    fieldType,
+    required,
+    placeholder
+  }
 }`;
 
 // Form Questions by Category

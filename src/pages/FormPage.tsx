@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { cn, maskPhone, maskCPF, maskDate } from '@/lib/utils';
+import { toast } from 'sonner';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { client } from '@/lib/sanityClient';
-import { FORM_CATEGORIES_QUERY, FORM_QUESTIONS_QUERY } from '@/lib/queries';
-import type { FormCategory, FormQuestion } from '@/lib/types';
+import { FORM_CATEGORIES_QUERY } from '@/lib/queries';
+import type { FormCategory } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,26 +17,34 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { ClipboardList, Send, Loader2, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
+import { ClipboardList, Send, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { sendToGoogleSheets } from '@/lib/googleSheets';
 
 // Esquema de validação básico
 const baseSchema = z.object({
-  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-  email: z.string().email('E-mail inválido'),
-  phone: z.string().min(10, 'Telefone inválido'),
+  name: z.string()
+    .min(3, 'Nome deve ter pelo menos 3 caracteres')
+    .max(100, 'Nome muito longo')
+    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, 'Nome deve conter apenas letras'),
+  email: z.string()
+    .min(1, 'E-mail é obrigatório')
+    .email('E-mail inválido'),
+  phone: z.string()
+    .min(1, 'Telefone é obrigatório')
+    .refine((val) => {
+      const digits = val.replace(/\D/g, '');
+      return digits.length >= 10 && digits.length <= 11;
+    }, 'Telefone incompleto. Digite o DDD e todos os números.'),
   categoryId: z.string().min(1, 'Selecione o tipo de formulário'),
 });
 
 export default function FormPage() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<FormCategory[]>([]);
-  const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
-  const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dynamicErrors, setDynamicErrors] = useState<Record<string, string>>({});
 
   const {
     register,
@@ -55,6 +65,8 @@ export default function FormPage() {
   });
 
   const selectedCategoryId = watch('categoryId');
+  const currentCategory = categories.find(c => c._id === selectedCategoryId);
+  const currentQuestions = currentCategory?.questions || [];
 
   useEffect(() => {
     async function fetchCategories() {
@@ -70,68 +82,19 @@ export default function FormPage() {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    if (!selectedCategoryId) {
-      setQuestions([]);
-      return;
-    }
-
-    async function fetchQuestions() {
-      // Resetar estados imediatamente para forçar a exibição do skeleton
-      setQuestions([]);
-      setLoadingQuestions(true);
-      setDynamicErrors({}); // Limpar erros dinâmicos
-
-      try {
-        const data = await client.fetch(FORM_QUESTIONS_QUERY, { categoryId: selectedCategoryId });
-        setQuestions(data);
-      } catch (error) {
-        // Silently fail
-      } finally {
-        setLoadingQuestions(false);
-      }
-    }
-
-    fetchQuestions();
-  }, [selectedCategoryId]);
-
   const onSubmit = async (data: any) => {
-    // 1. Validar campos dinâmicos manualmente de acordo com o Sanity
-    const newErrors: Record<string, string> = {};
-    const currentValues = watch('dynamic') || {};
-
-    questions.forEach((q) => {
-      const value = currentValues[q.fieldName];
-      if (q.required && (!value || (typeof value === 'string' && value.trim() === ''))) {
-        newErrors[q.fieldName] = 'Este campo é obrigatório';
-      }
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setDynamicErrors(newErrors);
-      return;
-    }
-
     setIsSubmitting(true);
-    setDynamicErrors({});
 
     try {
-      const categoryName = categories.find(c => c._id === selectedCategoryId)?.label || '';
-
-      // 2. Mapeamento Estrito (Apenas campos definidos no Sanity)
-      const sanitizedDynamicData: Record<string, any> = {};
-      questions.forEach(q => {
-        if (currentValues[q.fieldName] !== undefined) {
-          sanitizedDynamicData[q.fieldName] = currentValues[q.fieldName];
-        }
-      });
+      const categoryName = currentCategory?.label || '';
+      const dynamicValues = data.dynamic || {};
 
       const payload = {
         name: data.name,
         email: data.email,
         phone: data.phone,
         category: categoryName,
-        ...sanitizedDynamicData
+        ...dynamicValues
       };
 
       // 3. Enviar para o Google Sheets (Web App)
@@ -139,16 +102,25 @@ export default function FormPage() {
 
       if (result.success) {
         setIsSubmitted(true);
+        toast.success("Formulário enviado com sucesso!");
         reset();
-        setTimeout(() => setIsSubmitted(false), 5000);
       } else {
         throw new Error(result.message);
       }
     } catch (error) {
       setSubmitError(true);
-      setTimeout(() => setSubmitError(false), 6000);
+      toast.error("Ops! Algo deu errado ao enviar o formulário.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Handler for Zod validation errors
+  const onInvalid = (errors: any) => {
+    const firstErrorKey = Object.keys(errors)[0];
+    if (firstErrorKey) {
+      const errorMessage = errors[firstErrorKey].message;
+      toast.error(errorMessage);
     }
   };
 
@@ -182,13 +154,23 @@ export default function FormPage() {
           <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
             Sua solicitação foi enviada com sucesso. Nossa equipe entrará em contato com você em breve.
           </p>
-          <Button
-            size="lg"
-            className="w-full h-14 text-lg bg-fire-gradient hover:opacity-90 font-bold"
-            onClick={() => setIsSubmitted(false)}
-          >
-            Enviar novo formulário
-          </Button>
+          <div className="flex flex-col gap-4">
+            <Button
+              size="lg"
+              className="w-full h-14 text-lg bg-fire-gradient hover:opacity-90 font-bold"
+              onClick={() => setIsSubmitted(false)}
+            >
+              Fazer outra inscrição
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full h-14 text-lg border-primary/20 hover:bg-accent/10 font-bold"
+              onClick={() => navigate('/')}
+            >
+              Ir para a Home
+            </Button>
+          </div>
         </motion.div>
       </div>
     );
@@ -224,14 +206,24 @@ export default function FormPage() {
           <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
             Não foi possível completar o envio do formulário no momento.
           </p>
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full h-14 text-lg border-red-500/50 hover:bg-red-500/10 text-red-500 font-bold"
-            onClick={() => setSubmitError(false)}
-          >
-            Tentar novamente
-          </Button>
+          <div className="flex flex-col gap-4">
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full h-14 text-lg border-red-500/50 hover:bg-red-500/10 text-red-500 font-bold"
+              onClick={() => setSubmitError(false)}
+            >
+              Tentar novamente
+            </Button>
+            <Button
+              size="lg"
+              variant="ghost"
+              className="w-full h-14 text-lg hover:bg-accent/10 font-bold"
+              onClick={() => navigate('/')}
+            >
+              Voltar para a Home
+            </Button>
+          </div>
         </motion.div>
       </div>
     );
@@ -273,7 +265,7 @@ export default function FormPage() {
             <CardDescription className="text-sm sm:text-base">Preencha seus dados básicos para começarmos.</CardDescription>
           </CardHeader>
           <CardContent className="p-6 sm:p-8 pt-0 sm:pt-0">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome Completo</Label>
@@ -286,11 +278,6 @@ export default function FormPage() {
                       errors.name ? 'border-destructive ring-destructive/20' : ''
                     )}
                   />
-                  {errors.name && (
-                    <p className="text-xs text-destructive flex items-center gap-1">
-                      <AlertCircle size={12} /> {errors.name.message as string}
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -305,29 +292,29 @@ export default function FormPage() {
                       errors.email ? 'border-destructive ring-destructive/20' : ''
                     )}
                   />
-                  {errors.email && (
-                    <p className="text-xs text-destructive flex items-center gap-1">
-                      <AlertCircle size={12} /> {errors.email.message as string}
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">WhatsApp / Telefone</Label>
-                  <Input
-                    id="phone"
-                    placeholder="(00) 00000-0000"
-                    {...register('phone')}
-                    className={cn(
-                      "bg-white text-black placeholder:text-gray-500",
-                      errors.phone ? 'border-destructive ring-destructive/20' : ''
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="phone"
+                        placeholder="(00) 00000-0000"
+                        onChange={(e) => {
+                          const masked = maskPhone(e.target.value);
+                          field.onChange(masked);
+                        }}
+                        className={cn(
+                          "bg-white text-black placeholder:text-gray-500",
+                          errors.phone ? 'border-destructive ring-destructive/20' : ''
+                        )}
+                      />
                     )}
                   />
-                  {errors.phone && (
-                    <p className="text-xs text-destructive flex items-center gap-1">
-                      <AlertCircle size={12} /> {errors.phone.message as string}
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -357,11 +344,6 @@ export default function FormPage() {
                       )}
                     />
                   )}
-                  {errors.categoryId && (
-                    <p className="text-xs text-destructive flex items-center gap-1">
-                      <AlertCircle size={12} /> {errors.categoryId.message as string}
-                    </p>
-                  )}
                 </div>
               </div>
 
@@ -372,89 +354,88 @@ export default function FormPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="space-y-6 pt-4 overflow-hidden"
+                    className="space-y-6 pt-4"
                   >
                     <div className="space-y-2">
                       <Separator className="bg-border/50" />
                       <div className="pt-4">
                         <h3 className="text-lg font-semibold flex items-center gap-2">
                           Perguntas Específicas
-                          {loadingQuestions && <Loader2 size={16} className="animate-spin text-primary" />}
                         </h3>
                         <p className="text-sm text-muted-foreground">Conte-nos mais detalhes sobre sua necessidade.</p>
                       </div>
                     </div>
 
                     <AnimatePresence mode="popLayout" initial={false}>
-                      {loadingQuestions ? (
-                        <motion.div
-                          key="skeleton-loader"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="space-y-4"
-                        >
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-32" />
-                            <Skeleton className="h-20 w-full rounded-lg" />
-                          </div>
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-40" />
-                            <Skeleton className="h-10 w-full rounded-lg" />
-                          </div>
-                        </motion.div>
-                      ) : questions.length > 0 ? (
-                        <motion.div
-                          key={`questions-${selectedCategoryId}`}
-                          initial={{ opacity: 0, x: 10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          className="space-y-4"
-                        >
-                          {questions.map((q) => (
-                            <div key={q._id} className="space-y-2">
-                              <Label className="text-sm font-semibold">
-                                {q.question} {q.required && <span className="text-primary">*</span>}
-                              </Label>
-                              {q.fieldType === 'textarea' ? (
-                                <Textarea
-                                  placeholder={q.placeholder}
-                                  {...register(`dynamic.${q.fieldName}` as any)}
-                                  className={cn(
-                                    "bg-white text-black placeholder:text-gray-500 transition-all min-h-[100px]",
-                                    dynamicErrors[q.fieldName] && "border-destructive ring-destructive/20"
-                                  )}
-                                />
-                              ) : (
-                                <Input
-                                  type={q.fieldType}
-                                  placeholder={q.placeholder}
-                                  {...register(`dynamic.${q.fieldName}` as any)}
-                                  className={cn(
-                                    "bg-white text-black placeholder:text-gray-500 transition-all h-12",
-                                    dynamicErrors[q.fieldName] && "border-destructive ring-destructive/20"
-                                  )}
-                                />
-                              )}
-                              {dynamicErrors[q.fieldName] && (
-                                <p className="text-xs text-destructive flex items-center gap-1">
-                                  <AlertCircle size={12} /> {dynamicErrors[q.fieldName]}
-                                </p>
-                              )}
+                      <motion.div
+                        key={`questions-${selectedCategoryId}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-6"
+                      >
+                        {currentQuestions.map((q) => {
+                          const fieldId = q.fieldName.current;
+                          
+                          return (
+                            <div key={fieldId} className="space-y-2">
+                              <Controller
+                                name={`dynamic.${fieldId}`}
+                                control={control}
+                                rules={{ 
+                                  required: q.required ? "Este campo é obrigatório" : false 
+                                }}
+                                render={({ field, fieldState: { error } }) => {
+                                  const hasError = !!error;
+                                  
+                                  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                                    let val = e.target.value;
+                                    if (q.fieldType === 'tel') val = maskPhone(val);
+                                    if (q.fieldType === 'cpf') val = maskCPF(val);
+                                    if (q.fieldType === 'date') val = maskDate(val);
+                                    field.onChange(val);
+                                  };
+
+                                  return (
+                                    <div className="space-y-2">
+                                      <Label 
+                                        htmlFor={fieldId}
+                                        className={cn(hasError ? "text-destructive" : "")}
+                                      >
+                                        {q.question} {q.required && <span className="text-destructive">*</span>}
+                                      </Label>
+                                      
+                                      {q.fieldType === 'textarea' ? (
+                                        <Textarea
+                                          {...field}
+                                          id={fieldId}
+                                          placeholder={q.placeholder || "Digite aqui..."}
+                                          onChange={handleChange}
+                                          className={cn(
+                                            "bg-white text-black min-h-[120px] resize-none",
+                                            hasError ? "border-destructive ring-destructive/20" : ""
+                                          )}
+                                        />
+                                      ) : (
+                                        <Input
+                                          {...field}
+                                          id={fieldId}
+                                          type={q.fieldType === 'number' ? 'number' : 'text'}
+                                          placeholder={q.placeholder || (q.fieldType === 'date' ? "DD/MM/AAAA" : "Digite aqui...")}
+                                          onChange={handleChange}
+                                          className={cn(
+                                            "bg-white text-black h-12",
+                                            hasError ? "border-destructive ring-destructive/20" : ""
+                                          )}
+                                        />
+                                      )}
+                                    </div>
+                                  );
+                                }}
+                              />
                             </div>
-                          ))}
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="no-questions"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="p-8 border border-dashed rounded-lg text-center bg-muted/20"
-                        >
-                          <p className="text-muted-foreground">Nenhuma pergunta adicional necessária para este tipo.</p>
-                        </motion.div>
-                      )}
+                          );
+                        })}
+                      </motion.div>
                     </AnimatePresence>
                   </motion.div>
                 )}

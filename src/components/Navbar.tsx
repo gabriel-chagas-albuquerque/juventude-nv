@@ -11,7 +11,7 @@ const navLinks = [
   { label: 'Início', to: '/' },
   { label: 'Sobre nós', to: '/sobre-nos' },
   { label: 'Programação/Eventos', to: '/programacao' },
-  { label: 'Fale Conosco', to: '/inscricao' },
+  { label: 'Fale Conosco', to: '/fale-conosco' },
   { label: 'ENEM Cristão', to: '/enem-cristao' },
 ];
 

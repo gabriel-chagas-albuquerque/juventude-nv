@@ -1,17 +1,18 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Navbar from '@/components/Navbar';
 import ScrollToTop from '@/components/ScrollToTop';
 import Footer from '@/components/Footer';
 import Home from '@/pages/Home';
 import FormPage from '@/pages/FormPage';
 import EnemCristao from '@/pages/EnemCristao';
-import StudioPage from '@/pages/StudioPage';
 import AboutUs from '@/pages/AboutUs';
 import SchedulePage from '@/pages/SchedulePage';
 
 function App() {
   return (
     <BrowserRouter>
+      <Toaster richColors position="top-right" />
       <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
@@ -20,9 +21,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/sobre-nos" element={<AboutUs />} />
             <Route path="/programacao" element={<SchedulePage />} />
-            <Route path="/inscricao" element={<FormPage />} />
+            <Route path="/fale-conosco" element={<FormPage />} />
             <Route path="/enem-cristao" element={<EnemCristao />} />
-            <Route path="/studio/*" element={<StudioPage />} />
           </Routes>
         </main>
         <Footer />
