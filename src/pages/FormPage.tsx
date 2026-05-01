@@ -187,7 +187,7 @@ export default function FormPage() {
               className="w-full h-14 text-lg bg-fire-gradient hover:opacity-90 font-bold"
               onClick={() => setIsSubmitted(false)}
             >
-              Fazer outra inscrição
+              Preencher novo formulário
             </Button>
             <Button
               size="lg"
