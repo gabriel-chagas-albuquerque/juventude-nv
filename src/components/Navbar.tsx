@@ -31,7 +31,17 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 glow-orange transition-all duration-300 group-hover:scale-110">
-              <img src={settings?.home?.logoUrl || "/src/assets/logo-juventude-nv.png"} alt="Logo" className="w-full h-full object-cover" />
+              <img 
+                src={settings?.home?.logoUrl || "/logo-juventude-nv.png"} 
+                alt="Logo" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== "/logo-juventude-nv.png") {
+                    target.src = "/logo-juventude-nv.png";
+                  }
+                }}
+              />
             </div>
             <span className="font-bold text-xl tracking-tight">
               <span className="text-foreground">{settings?.home?.title?.split(' ')[0] || "Juventude"}</span>{' '}

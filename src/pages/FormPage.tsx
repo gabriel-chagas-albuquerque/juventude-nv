@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { ClipboardList, Send, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { sendToGoogleSheets } from '@/lib/googleSheets';
+import { SEO } from '@/components/SEO';
 
 // Esquema de validação básico
 const baseSchema = z.object({
@@ -154,6 +155,7 @@ export default function FormPage() {
   if (isSubmitted) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <SEO title="Sucesso" description="Sua solicitação foi enviada com sucesso." />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -257,7 +259,12 @@ export default function FormPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen pt-24 pb-20 px-4">
+      <SEO 
+        title={currentCategory ? `Solicitação: ${currentCategory.label}` : "Solicitações"} 
+        description="Envie sua solicitação de oração, visita ou inscrição para a Juventude NV."
+        canonical="/solicitacoes"
+      />
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <motion.div
