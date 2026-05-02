@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@portabletext/react": "^6.0.3",
     "@sanity/client": "^7.22.0",
+    "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
