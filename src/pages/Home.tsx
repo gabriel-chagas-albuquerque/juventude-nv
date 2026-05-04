@@ -161,7 +161,7 @@ export default function Home() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-24"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-24 w-full max-w-sm sm:max-w-none mx-auto"
           >
             {navCards.map((card, index) => {
               const IconComponent = card.icon;
