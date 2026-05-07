@@ -18,6 +18,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { ClipboardList, Send, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { sendToGoogleSheets } from '@/lib/googleSheets';
 import { SEO } from '@/components/SEO';
 
@@ -104,9 +106,22 @@ export default function FormPage() {
         newValues[field] = currentValues[field] || '';
       });
       
-      reset(newValues);
+      // Inicializar campos dinâmicos para evitar avisos de uncontrolled/controlled
+      const dynamicFields: any = {};
+      currentQuestions.forEach(q => {
+        const fieldId = q.fieldName?.current || q.question.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        if (q.fieldType === 'select' && q.allowMultiple) {
+          dynamicFields[fieldId] = [];
+        } else if (q.fieldType === 'boolean') {
+          dynamicFields[fieldId] = false;
+        } else {
+          dynamicFields[fieldId] = '';
+        }
+      });
+      
+      reset({ ...newValues, ...dynamicFields });
     }
-  }, [selectedCategoryId, reset]);
+  }, [selectedCategoryId, reset]); // Removido currentQuestions dos deps para evitar loop se as perguntas mudarem no Sanity enquanto o form está aberto
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -119,8 +134,18 @@ export default function FormPage() {
       // Remove campos internos e prepara o payload
       const { categoryId, ...formData } = data;
 
+      // 2. Processar campos para garantir que arrays (múltipla escolha) virem strings para o Sheets
+      const processedFormData = Object.entries(formData).reduce((acc: any, [key, value]) => {
+        if (Array.isArray(value)) {
+          acc[key] = value.join(', ');
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+
       const payload = {
-        ...formData,
+        ...processedFormData,
         category: categoryName,
         timestamp: new Date().toISOString(),
       };
@@ -308,7 +333,7 @@ export default function FormPage() {
                     placeholder="Seu nome"
                     {...register('name')}
                     className={cn(
-                      "bg-white text-black placeholder:text-gray-500",
+                      "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
                       errors.name ? 'border-destructive ring-destructive/20' : ''
                     )}
                   />
@@ -322,7 +347,7 @@ export default function FormPage() {
                     placeholder="exemplo@email.com"
                     {...register('email')}
                     className={cn(
-                      "bg-white text-black placeholder:text-gray-500",
+                      "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
                       errors.email ? 'border-destructive ring-destructive/20' : ''
                     )}
                   />
@@ -343,7 +368,7 @@ export default function FormPage() {
                           field.onChange(masked);
                         }}
                         className={cn(
-                          "bg-white text-black placeholder:text-gray-500",
+                          "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
                           errors.phone ? 'border-destructive ring-destructive/20' : ''
                         )}
                       />
@@ -362,7 +387,7 @@ export default function FormPage() {
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger className={cn(
-                            "bg-white text-black h-12",
+                            "bg-white text-black h-12 border-border shadow-sm focus:border-primary/50 transition-all",
                             errors.categoryId ? 'border-destructive ring-destructive/20' : ''
                           )}>
                             <SelectValue placeholder="Selecione uma opção" />
@@ -447,10 +472,109 @@ export default function FormPage() {
                                           placeholder={q.placeholder || "Digite aqui..."}
                                           onChange={handleChange}
                                           className={cn(
-                                            "bg-white text-black min-h-[120px] resize-none",
+                                            "bg-white text-black min-h-[120px] resize-none border-border shadow-sm focus:border-primary/50 transition-all",
                                             hasError ? "border-destructive ring-destructive/20" : ""
                                           )}
                                         />
+                                      ) : q.fieldType === 'select' ? (
+                                        <div className="grid grid-cols-1 gap-3 pt-1">
+                                          {q.allowMultiple ? (
+                                            // Renderização de Checkboxes para múltipla escolha (várias opções)
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                              {q.options?.map((option) => {
+                                                const optionId = `${fieldId}-${option}`;
+                                                const isChecked = Array.isArray(field.value) && field.value.includes(option);
+                                                
+                                                return (
+                                                  <div 
+                                                    key={option} 
+                                                    className={cn(
+                                                      "relative flex items-center p-0 rounded-xl border border-border bg-white transition-all hover:bg-accent/5",
+                                                      isChecked ? "border-primary/50 bg-primary/5" : ""
+                                                    )}
+                                                  >
+                                                    <Checkbox 
+                                                      id={optionId}
+                                                      checked={isChecked}
+                                                      onCheckedChange={(checked) => {
+                                                        const currentValues = Array.isArray(field.value) ? field.value : [];
+                                                        const nextValues = checked
+                                                          ? [...currentValues, option]
+                                                          : currentValues.filter((v: string) => v !== option);
+                                                        field.onChange(nextValues);
+                                                      }}
+                                                      className="absolute left-4 z-10"
+                                                    />
+                                                    <Label 
+                                                      htmlFor={optionId}
+                                                      className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
+                                                    >
+                                                      {option}
+                                                    </Label>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          ) : (
+                                            // Renderização de Radio Group para múltipla escolha (apenas uma opção)
+                                            <RadioGroup 
+                                              onValueChange={field.onChange} 
+                                              value={field.value ?? ""}
+                                              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                            >
+                                              {q.options?.map((option) => {
+                                                const optionId = `${fieldId}-${option}`;
+                                                const isSelected = field.value === option;
+                                                
+                                                return (
+                                                  <div 
+                                                    key={option} 
+                                                    className={cn(
+  "relative flex items-center p-0 rounded-xl border-2 bg-white transition-all",
+  isSelected 
+    ? "border-primary bg-primary/10 shadow-sm" 
+    : "border-border hover:border-primary/40"
+)}
+                                                  >
+                                                    <RadioGroupItem 
+                                                      value={option} 
+                                                      id={optionId} 
+                                                      className="absolute left-4 z-10"
+                                                    />
+                                                    <Label 
+                                                      htmlFor={optionId}
+                                                      className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
+                                                    >
+                                                      {option}
+                                                    </Label>
+                                                  </div>
+                                                );
+                                              })}
+                                            </RadioGroup>
+                                          )}
+                                        </div>
+                                      ) : q.fieldType === 'boolean' ? (
+                                        <div className="pt-1">
+                                          <div 
+                                            className={cn(
+                                              "relative flex items-center p-0 rounded-xl border border-border bg-white transition-all hover:bg-accent/5 max-w-sm",
+                                              field.value ? "border-primary/50 bg-primary/5" : ""
+                                            )}
+                                          >
+                                            <Checkbox 
+                                              id={fieldId}
+                                              checked={!!field.value}
+                                              onCheckedChange={field.onChange}
+                                              className="absolute left-4 z-10"
+                                            />
+                                            <Label 
+                                              htmlFor={fieldId}
+                                              className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
+                                            >
+                                              Sim, confirmo
+                                            </Label>
+                                          </div>
+                                        </div>
                                       ) : (
                                         <Input
                                           {...field}
@@ -460,7 +584,7 @@ export default function FormPage() {
                                           placeholder={q.placeholder || (q.fieldType === 'date' ? "DD/MM/AAAA" : "Digite aqui...")}
                                           onChange={handleChange}
                                           className={cn(
-                                            "bg-white text-black h-12",
+                                            "bg-white text-black h-12 border-border shadow-sm focus:border-primary/50 transition-all",
                                             hasError ? "border-destructive ring-destructive/20" : ""
                                           )}
                                         />

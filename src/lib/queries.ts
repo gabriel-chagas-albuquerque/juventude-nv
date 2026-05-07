@@ -23,7 +23,9 @@ export const FORM_CATEGORIES_QUERY = `*[_type == "formCategory"] | order(label a
     fieldName,
     fieldType,
     required,
-    placeholder
+    placeholder,
+    options,
+    allowMultiple
   }
 }`;
 

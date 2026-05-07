@@ -3,9 +3,11 @@ export interface FormQuestion {
   fieldName: {
     current: string;
   };
-  fieldType: 'text' | 'textarea' | 'email' | 'tel' | 'date' | 'number' | 'cpf' | 'boolean';
+  fieldType: 'text' | 'textarea' | 'email' | 'tel' | 'date' | 'number' | 'cpf' | 'boolean' | 'select';
   required: boolean;
   placeholder?: string;
+  options?: string[];
+  allowMultiple?: boolean;
 }
 
 export interface FormCategory {
