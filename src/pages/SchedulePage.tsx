@@ -213,8 +213,15 @@ export default function SchedulePage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                      <Clock className="w-3 h-3" /> {event.time}
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-[#FF8000]" /> {event.time}
+                      </div>
+                      {event.location && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-[#00AEEF]" /> {event.location}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))

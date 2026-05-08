@@ -84,7 +84,7 @@ export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0] {
   }
 }`;
 
-// ABOUT US (Legacy/Specific - can be removed or kept if needed)
+// ABOUT US
 export const ABOUT_US_QUERY = `*[_type == "siteSettings"][0].aboutUs {
   title,
   description,

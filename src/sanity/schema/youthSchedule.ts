@@ -83,6 +83,12 @@ export const youthSchedule = defineType({
       type: 'text',
       rows: 3,
     }),
+    defineField({
+      name: 'location',
+      title: 'Local do Evento',
+      type: 'string',
+      description: 'Ex: Salão Principal, Auditório',
+    }),
   ],
   preview: {
     select: {
