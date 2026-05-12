@@ -8,8 +8,8 @@ O **Juventude NV** é uma plataforma web moderna desenvolvida para a organizaç�
 -   📅 **Programação & Eventos**: Sistema completo de cronograma com suporte a eventos semanais, mensais (dia fixo ou ordinal) e eventos únicos.
 -   📖 **ENEM Cristão**: Página dedicada para a iniciativa de estudo bíblico, com download de edital e informações de premiação.
 -   📝 **Formulários Inteligentes**: Sistema de formulários dinâmicos que adapta campos com base em categorias definidas no Sanity.
--   🎨 **Design Premium**: Interface moderna com animações suaves (Framer Motion), modo escuro e componentes Shadcn UI.
--   ⚙️ **CMS Centralizado**: Configurações globais do site, SEO e conteúdo institucional gerenciados em um único lugar.
+-   🎨 **Design Premium**: Interface moderna com animações suaves (Framer Motion) e componentes Shadcn UI.
+-   ⚙️ **CMS Centralizado**: Configurações globais do site e conteúdo institucional gerenciados em um único lugar.
 
 ## 🛠️ Tecnologias
 
@@ -72,12 +72,7 @@ O projeto utiliza o **Sanity Studio** integrado. Para gerenciar os esquemas loca
 
 Para implantar mudanças no esquema:
 ```bash
-npx sanity@latest schema deploy
+npx sanity deploy
 ```
 
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
 Desenvolvido com ❤️ pela equipe Juventude NV.
