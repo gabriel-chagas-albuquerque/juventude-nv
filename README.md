@@ -73,14 +73,20 @@ O projeto utiliza o **Sanity Studio** integrado. Para gerenciar os esquemas loca
 
 ### 📊 Integração com Google Sheets
 
-O sistema de formulários envia os dados para uma planilha via **Google Apps Script**.
+O sistema de formulários utiliza o **Google Apps Script (v3.0.0)** para persistência de dados e integração com o Sanity.
 
 1. Crie uma Planilha do Google.
 2. Vá em `Extensões` > `Apps Script`.
 3. Copie o conteúdo de `scripts/google-sheets-script.js` e cole no editor.
-4. Clique em **Implantar** > **Nova implantação**.
-5. Selecione o tipo **App da Web**, execute como **Eu** e dê acesso a **Qualquer um**.
-6. Copie a URL gerada e adicione ao seu `.env` como `VITE_GOOGLE_SCRIPT_URL`.
+4. No menu lateral esquerdo, clique em **Configurações do Projeto** (ícone de engrenagem).
+5. Role até **Propriedades do script** e adicione as seguintes chaves:
+   - `FORM_TOKEN`: O mesmo token definido no seu `.env`.
+   - `SANITY_PROJECT_ID`: ID do seu projeto Sanity.
+   - `SANITY_DATASET`: Nome do dataset (ex: `production`).
+   - `SANITY_READ_TOKEN`: Token de leitura do Sanity (gerado no painel da Sanity em API > Tokens).
+6. Clique em **Implantar** > **Nova implantação**.
+7. Selecione o tipo **App da Web**, execute como **Eu** e dê acesso a **Qualquer um**.
+8. Copie a URL gerada e adicione ao seu `.env` como `VITE_GOOGLE_SCRIPT_URL`.
 
 Para implantar mudanças no esquema:
 ```bash
