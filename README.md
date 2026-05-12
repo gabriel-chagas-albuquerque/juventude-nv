@@ -70,10 +70,13 @@ O projeto utiliza o **Sanity Studio** integrado. Para gerenciar os esquemas loca
 
 -   A configuração do Studio está em `sanity.config.ts`.
 -   Os esquemas de dados estão em `src/sanity/schema/`.
-
+Para implantar mudanças no esquema:
+```bash
+npx sanity deploy
+```
 ### 📊 Integração com Google Sheets
 
-O sistema de formulários utiliza o **Google Apps Script (v3.0.0)** para persistência de dados e integração com o Sanity.
+O sistema de formulários utiliza o **Google Apps Script** para persistência de dados e integração com o Sanity.
 
 1. Crie uma Planilha do Google.
 2. Vá em `Extensões` > `Apps Script`.
@@ -88,9 +91,6 @@ O sistema de formulários utiliza o **Google Apps Script (v3.0.0)** para persist
 7. Selecione o tipo **App da Web**, execute como **Eu** e dê acesso a **Qualquer um**.
 8. Copie a URL gerada e adicione ao seu `.env` como `VITE_GOOGLE_SCRIPT_URL`.
 
-Para implantar mudanças no esquema:
-```bash
-npx sanity deploy
-```
+
 
 Desenvolvido com ❤️ pela equipe Juventude NV.
