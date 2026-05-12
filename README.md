@@ -55,6 +55,7 @@ O **Juventude NV** é uma plataforma web moderna desenvolvida para a organizaç�
 ## 🏗️ Estrutura do Projeto
 
 ```text
+scripts/            # Scripts auxiliares (Google Apps Script)
 src/
 ├── components/     # Componentes de UI reaproveitáveis (Shadcn)
 ├── lib/            # Configurações de clientes (Sanity, Queries, Tipagem)
@@ -69,6 +70,17 @@ O projeto utiliza o **Sanity Studio** integrado. Para gerenciar os esquemas loca
 
 -   A configuração do Studio está em `sanity.config.ts`.
 -   Os esquemas de dados estão em `src/sanity/schema/`.
+
+### 📊 Integração com Google Sheets
+
+O sistema de formulários envia os dados para uma planilha via **Google Apps Script**.
+
+1. Crie uma Planilha do Google.
+2. Vá em `Extensões` > `Apps Script`.
+3. Copie o conteúdo de `scripts/google-sheets-script.js` e cole no editor.
+4. Clique em **Implantar** > **Nova implantação**.
+5. Selecione o tipo **App da Web**, execute como **Eu** e dê acesso a **Qualquer um**.
+6. Copie a URL gerada e adicione ao seu `.env` como `VITE_GOOGLE_SCRIPT_URL`.
 
 Para implantar mudanças no esquema:
 ```bash
