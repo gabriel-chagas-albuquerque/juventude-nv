@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn, maskPhone, maskCPF, maskDate } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -47,6 +47,7 @@ export default function FormPage() {
   const categoriaParam = searchParams.get('categoria');
   const [categories, setCategories] = useState<FormCategory[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,17 +78,21 @@ export default function FormPage() {
     async function fetchCategories() {
       try {
         const data = await client.fetch(FORM_CATEGORIES_QUERY);
-        setCategories(data);
-        
-        // Auto-select category if param matches identifier
-        if (categoriaParam && data.length > 0) {
-          const matched = data.find((c: any) => c.identifier === categoriaParam);
-          if (matched) {
-            setValue('categoryId', matched._id);
+        if (!data || data.length === 0) {
+          setCategoriesError(true);
+        } else {
+          setCategories(data);
+          
+          // Auto-select category if param matches identifier
+          if (categoriaParam) {
+            const matched = data.find((c: any) => c.identifier === categoriaParam);
+            if (matched) {
+              setValue('categoryId', matched._id);
+            }
           }
         }
       } catch (error) {
-        // Silently fail
+        setCategoriesError(true);
       } finally {
         setLoadingCategories(false);
       }
@@ -177,6 +182,37 @@ export default function FormPage() {
     }
   };
 
+  if (loadingCategories) {
+    return (
+      <div className="min-h-screen pt-24 pb-20 px-4">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="text-center space-y-4">
+            <Skeleton className="h-8 w-48 mx-auto rounded-full" />
+            <Skeleton className="h-12 w-72 mx-auto" />
+            <Skeleton className="h-6 w-full max-w-lg mx-auto" />
+          </div>
+          <Card className="border-border bg-card shadow-sm">
+            <CardHeader className="p-6 sm:p-8">
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-5 w-64" />
+            </CardHeader>
+            <CardContent className="p-6 sm:p-8 pt-0 sm:pt-0 space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                  </div>
+                ))}
+              </div>
+              <Skeleton className="h-14 w-full rounded-xl" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   if (isSubmitted) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -223,6 +259,42 @@ export default function FormPage() {
               onClick={() => navigate('/')}
             >
               Ir para a Home
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (categoriesError) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center p-12 rounded-3xl border border-border bg-card max-w-lg w-full shadow-xl"
+        >
+          <div className="relative inline-block mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
+              className="w-24 h-24 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto"
+            >
+              <XCircle className="w-12 h-12 text-amber-500" />
+            </motion.div>
+          </div>
+          <h2 className="text-3xl font-extrabold mb-4">Formulário Indisponível</h2>
+          <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+            Desculpe, o sistema de solicitações está em manutenção ou indisponível no momento. Por favor, tente novamente mais tarde.
+          </p>
+          <div className="flex flex-col gap-4">
+            <Button
+              size="lg"
+              className="w-full h-14 text-lg bg-primary hover:opacity-90 font-bold"
+              onClick={() => navigate('/')}
+            >
+              Voltar para a Home
             </Button>
           </div>
         </motion.div>
@@ -288,7 +360,7 @@ export default function FormPage() {
       <SEO 
         title={currentCategory ? `Solicitação: ${currentCategory.label}` : "Solicitações"} 
         description="Envie sua solicitação de oração, visita ou inscrição para a Juventude NV."
-        canonical="/solicitacoes"
+        canonical="/fale-conosco"
       />
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-2">
@@ -325,302 +397,299 @@ export default function FormPage() {
           </CardHeader>
           <CardContent className="p-6 sm:p-8 pt-0 sm:pt-0">
             <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome Completo</Label>
-                  <Input
-                    id="name"
-                    placeholder="Seu nome"
-                    {...register('name')}
-                    className={cn(
-                      "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
-                      errors.name ? 'border-destructive ring-destructive/20' : ''
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="exemplo@email.com"
-                    {...register('email')}
-                    className={cn(
-                      "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
-                      errors.email ? 'border-destructive ring-destructive/20' : ''
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">WhatsApp / Telefone</Label>
-                  <Controller
-                    name="phone"
-                    control={control}
-                    render={({ field }) => (
+              {categories.length > 0 && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome Completo</Label>
                       <Input
-                        {...field}
-                        id="phone"
-                        placeholder="(00) 00000-0000"
-                        onChange={(e) => {
-                          const masked = maskPhone(e.target.value);
-                          field.onChange(masked);
-                        }}
+                        id="name"
+                        placeholder="Seu nome"
+                        {...register('name')}
                         className={cn(
                           "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
-                          errors.phone ? 'border-destructive ring-destructive/20' : ''
+                          errors.name ? 'border-destructive ring-destructive/20' : ''
                         )}
                       />
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="categoryId">Tipo de Solicitação</Label>
-                  {loadingCategories ? (
-                    <Skeleton className="h-10 w-full rounded-lg" />
-                  ) : (
-                    <Controller
-                      name="categoryId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger className={cn(
-                            "bg-white text-black h-12 border-border shadow-sm focus:border-primary/50 transition-all",
-                            errors.categoryId ? 'border-destructive ring-destructive/20' : ''
-                          )}>
-                            <SelectValue placeholder="Selecione uma opção" />
-                          </SelectTrigger>
-                          <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)] bg-secondary border-border shadow-2xl">
-                            {categories.map((cat) => (
-                              <SelectItem key={cat._id} value={cat._id} className="cursor-pointer py-3">
-                                {cat.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="relative">
-                {selectedCategoryId && (
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="space-y-6 pt-4"
-                  >
-                    <div className="space-y-2">
-                      <Separator className="bg-border/50" />
-                      <div className="pt-4">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                          Perguntas Específicas
-                        </h3>
-                        <p className="text-sm text-muted-foreground">Conte-nos mais detalhes sobre sua necessidade.</p>
-                      </div>
                     </div>
 
-                    <AnimatePresence mode="popLayout" initial={false}>
-                      <motion.div
-                        key={`questions-${selectedCategoryId}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="space-y-6"
-                      >
-                        {currentQuestions.map((q) => {
-                          // Fallback caso o slug não esteja preenchido no Sanity
-                          const fieldId = q.fieldName?.current || q.question.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-                          
-                          return (
-                            <div key={fieldId} className="space-y-2">
-                              <Controller
-                                name={fieldId}
-                                control={control}
-                                rules={{ 
-                                  required: q.required ? "Este campo é obrigatório" : false 
-                                }}
-                                render={({ field, fieldState: { error } }) => {
-                                  const hasError = !!error;
-                                  
-                                  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                                    let val = e.target.value;
-                                    if (q.fieldType === 'tel') val = maskPhone(val);
-                                    if (q.fieldType === 'cpf') val = maskCPF(val);
-                                    if (q.fieldType === 'date') val = maskDate(val);
-                                    field.onChange(val);
-                                  };
+                    <div className="space-y-2">
+                      <Label htmlFor="email">E-mail</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="exemplo@email.com"
+                        {...register('email')}
+                        className={cn(
+                          "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
+                          errors.email ? 'border-destructive ring-destructive/20' : ''
+                        )}
+                      />
+                    </div>
 
-                                  return (
-                                    <div className="space-y-2">
-                                      <Label 
-                                        htmlFor={fieldId}
-                                        className={cn(hasError ? "text-destructive" : "")}
-                                      >
-                                        {q.question} {q.required && <span className="text-destructive">*</span>}
-                                      </Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">WhatsApp / Telefone</Label>
+                      <Controller
+                        name="phone"
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            id="phone"
+                            placeholder="(00) 00000-0000"
+                            onChange={(e) => {
+                              const masked = maskPhone(e.target.value);
+                              field.onChange(masked);
+                            }}
+                            className={cn(
+                              "bg-white text-black placeholder:text-gray-500 border-border shadow-sm focus:border-primary/50 transition-all",
+                              errors.phone ? 'border-destructive ring-destructive/20' : ''
+                            )}
+                          />
+                        )}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="categoryId">Tipo de Solicitação</Label>
+                      <Controller
+                        name="categoryId"
+                        control={control}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <SelectTrigger className={cn(
+                              "bg-white text-black h-12 border-border shadow-sm focus:border-primary/50 transition-all",
+                              errors.categoryId ? 'border-destructive ring-destructive/20' : ''
+                            )}>
+                              <SelectValue placeholder="Selecione uma opção" />
+                            </SelectTrigger>
+                            <SelectContent position="popper" className="w-[var(--radix-select-trigger-width)] bg-secondary border-border shadow-2xl">
+                              {categories.map((cat) => (
+                                <SelectItem key={cat._id} value={cat._id} className="cursor-pointer py-3">
+                                  {cat.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    {selectedCategoryId && (
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="space-y-6 pt-4"
+                      >
+                        <div className="space-y-2">
+                          <Separator className="bg-border/50" />
+                          <div className="pt-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                              Perguntas Específicas
+                            </h3>
+                            <p className="text-sm text-muted-foreground">Conte-nos mais detalhes sobre sua necessidade.</p>
+                          </div>
+                        </div>
+
+                        <AnimatePresence mode="popLayout" initial={false}>
+                          <motion.div
+                            key={`questions-${selectedCategoryId}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="space-y-6"
+                          >
+                            {currentQuestions.map((q) => {
+                              const fieldId = q.fieldName?.current || q.question.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+                              
+                              return (
+                                <div key={fieldId} className="space-y-2">
+                                  <Controller
+                                    name={fieldId}
+                                    control={control}
+                                    rules={{ 
+                                      required: q.required ? "Este campo é obrigatório" : false 
+                                    }}
+                                    render={({ field, fieldState: { error } }) => {
+                                      const hasError = !!error;
                                       
-                                      {q.fieldType === 'textarea' ? (
-                                        <Textarea
-                                          {...field}
-                                          value={field.value ?? ''}
-                                          id={fieldId}
-                                          placeholder={q.placeholder || "Digite aqui..."}
-                                          onChange={handleChange}
-                                          className={cn(
-                                            "bg-white text-black min-h-[120px] resize-none border-border shadow-sm focus:border-primary/50 transition-all",
-                                            hasError ? "border-destructive ring-destructive/20" : ""
-                                          )}
-                                        />
-                                      ) : q.fieldType === 'select' ? (
-                                        <div className="grid grid-cols-1 gap-3 pt-1">
-                                          {q.allowMultiple ? (
-                                            // Renderização de Checkboxes para múltipla escolha (várias opções)
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                              {q.options?.map((option) => {
-                                                const optionId = `${fieldId}-${option}`;
-                                                const isChecked = Array.isArray(field.value) && field.value.includes(option);
-                                                
-                                                return (
-                                                  <div 
-                                                    key={option} 
-                                                    className={cn(
-                                                      "relative flex items-center p-0 rounded-xl border border-border bg-white transition-all hover:bg-accent/5",
-                                                      isChecked ? "border-primary/50 bg-primary/5" : ""
-                                                    )}
-                                                  >
-                                                    <Checkbox 
-                                                      id={optionId}
-                                                      checked={isChecked}
-                                                      onCheckedChange={(checked) => {
-                                                        const currentValues = Array.isArray(field.value) ? field.value : [];
-                                                        const nextValues = checked
-                                                          ? [...currentValues, option]
-                                                          : currentValues.filter((v: string) => v !== option);
-                                                        field.onChange(nextValues);
-                                                      }}
-                                                      className="absolute left-4 z-10"
-                                                    />
-                                                    <Label 
-                                                      htmlFor={optionId}
-                                                      className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
-                                                    >
-                                                      {option}
-                                                    </Label>
-                                                  </div>
-                                                );
-                                              })}
+                                      const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                                        let val = e.target.value;
+                                        if (q.fieldType === 'tel') val = maskPhone(val);
+                                        if (q.fieldType === 'cpf') val = maskCPF(val);
+                                        if (q.fieldType === 'date') val = maskDate(val);
+                                        field.onChange(val);
+                                      };
+
+                                      return (
+                                        <div className="space-y-2">
+                                          <Label 
+                                            htmlFor={fieldId}
+                                            className={cn(hasError ? "text-destructive" : "")}
+                                          >
+                                            {q.question} {q.required && <span className="text-destructive">*</span>}
+                                          </Label>
+                                          
+                                          {q.fieldType === 'textarea' ? (
+                                            <Textarea
+                                              {...field}
+                                              value={field.value ?? ''}
+                                              id={fieldId}
+                                              placeholder={q.placeholder || "Digite aqui..."}
+                                              onChange={handleChange}
+                                              className={cn(
+                                                "bg-white text-black min-h-[120px] resize-none border-border shadow-sm focus:border-primary/50 transition-all",
+                                                hasError ? "border-destructive ring-destructive/20" : ""
+                                              )}
+                                            />
+                                          ) : q.fieldType === 'select' ? (
+                                            <div className="grid grid-cols-1 gap-3 pt-1">
+                                              {q.allowMultiple ? (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                  {q.options?.map((option) => {
+                                                    const optionId = `${fieldId}-${option}`;
+                                                    const isChecked = Array.isArray(field.value) && field.value.includes(option);
+                                                    
+                                                    return (
+                                                      <div 
+                                                        key={option} 
+                                                        className={cn(
+                                                          "relative flex items-center p-0 rounded-xl border border-border bg-white transition-all hover:bg-accent/5",
+                                                          isChecked ? "border-primary/50 bg-primary/5" : ""
+                                                        )}
+                                                      >
+                                                        <Checkbox 
+                                                          id={optionId}
+                                                          checked={isChecked}
+                                                          onCheckedChange={(checked) => {
+                                                            const currentValues = Array.isArray(field.value) ? field.value : [];
+                                                            const nextValues = checked
+                                                              ? [...currentValues, option]
+                                                              : currentValues.filter((v: string) => v !== option);
+                                                            field.onChange(nextValues);
+                                                          }}
+                                                          className="absolute left-4 z-10"
+                                                        />
+                                                        <Label 
+                                                          htmlFor={optionId}
+                                                          className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
+                                                        >
+                                                          {option}
+                                                        </Label>
+                                                      </div>
+                                                    );
+                                                  })}
+                                                </div>
+                                              ) : (
+                                                <RadioGroup 
+                                                  onValueChange={field.onChange} 
+                                                  value={field.value ?? ""}
+                                                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                >
+                                                  {q.options?.map((option) => {
+                                                    const optionId = `${fieldId}-${option}`;
+                                                    const isSelected = field.value === option;
+                                                    
+                                                    return (
+                                                      <div 
+                                                        key={option} 
+                                                        className={cn(
+                                                          "relative flex items-center p-0 rounded-xl border-2 bg-white transition-all",
+                                                          isSelected 
+                                                            ? "border-primary bg-primary/10 shadow-sm" 
+                                                            : "border-border hover:border-primary/40"
+                                                        )}
+                                                      >
+                                                        <RadioGroupItem 
+                                                          value={option} 
+                                                          id={optionId} 
+                                                          className="absolute left-4 z-10"
+                                                        />
+                                                        <Label 
+                                                          htmlFor={optionId}
+                                                          className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
+                                                        >
+                                                          {option}
+                                                        </Label>
+                                                      </div>
+                                                    );
+                                                  })}
+                                                </RadioGroup>
+                                              )}
+                                            </div>
+                                          ) : q.fieldType === 'boolean' ? (
+                                            <div className="pt-1">
+                                              <div 
+                                                className={cn(
+                                                  "relative flex items-center p-0 rounded-xl border border-border bg-white transition-all hover:bg-accent/5 max-w-sm",
+                                                  field.value ? "border-primary/50 bg-primary/5" : ""
+                                                )}
+                                              >
+                                                <Checkbox 
+                                                  id={fieldId}
+                                                  checked={!!field.value}
+                                                  onCheckedChange={field.onChange}
+                                                  className="absolute left-4 z-10"
+                                                />
+                                                <Label 
+                                                  htmlFor={fieldId}
+                                                  className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
+                                                >
+                                                  Sim, confirmo
+                                                </Label>
+                                              </div>
                                             </div>
                                           ) : (
-                                            // Renderização de Radio Group para múltipla escolha (apenas uma opção)
-                                            <RadioGroup 
-                                              onValueChange={field.onChange} 
-                                              value={field.value ?? ""}
-                                              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                                            >
-                                              {q.options?.map((option) => {
-                                                const optionId = `${fieldId}-${option}`;
-                                                const isSelected = field.value === option;
-                                                
-                                                return (
-                                                  <div 
-                                                    key={option} 
-                                                    className={cn(
-  "relative flex items-center p-0 rounded-xl border-2 bg-white transition-all",
-  isSelected 
-    ? "border-primary bg-primary/10 shadow-sm" 
-    : "border-border hover:border-primary/40"
-)}
-                                                  >
-                                                    <RadioGroupItem 
-                                                      value={option} 
-                                                      id={optionId} 
-                                                      className="absolute left-4 z-10"
-                                                    />
-                                                    <Label 
-                                                      htmlFor={optionId}
-                                                      className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
-                                                    >
-                                                      {option}
-                                                    </Label>
-                                                  </div>
-                                                );
-                                              })}
-                                            </RadioGroup>
-                                          )}
-                                        </div>
-                                      ) : q.fieldType === 'boolean' ? (
-                                        <div className="pt-1">
-                                          <div 
-                                            className={cn(
-                                              "relative flex items-center p-0 rounded-xl border border-border bg-white transition-all hover:bg-accent/5 max-w-sm",
-                                              field.value ? "border-primary/50 bg-primary/5" : ""
-                                            )}
-                                          >
-                                            <Checkbox 
+                                            <Input
+                                              {...field}
+                                              value={field.value ?? ''}
                                               id={fieldId}
-                                              checked={!!field.value}
-                                              onCheckedChange={field.onChange}
-                                              className="absolute left-4 z-10"
+                                              type={q.fieldType === 'number' ? 'number' : 'text'}
+                                              placeholder={q.placeholder || (q.fieldType === 'date' ? "DD/MM/AAAA" : "Digite aqui...")}
+                                              onChange={handleChange}
+                                              className={cn(
+                                                "bg-white text-black h-12 border-border shadow-sm focus:border-primary/50 transition-all",
+                                                hasError ? "border-destructive ring-destructive/20" : ""
+                                              )}
                                             />
-                                            <Label 
-                                              htmlFor={fieldId}
-                                              className="flex-1 cursor-pointer font-medium text-black py-4 pl-12 pr-4 min-h-[52px] flex items-center"
-                                            >
-                                              Sim, confirmo
-                                            </Label>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <Input
-                                          {...field}
-                                          value={field.value ?? ''}
-                                          id={fieldId}
-                                          type={q.fieldType === 'number' ? 'number' : 'text'}
-                                          placeholder={q.placeholder || (q.fieldType === 'date' ? "DD/MM/AAAA" : "Digite aqui...")}
-                                          onChange={handleChange}
-                                          className={cn(
-                                            "bg-white text-black h-12 border-border shadow-sm focus:border-primary/50 transition-all",
-                                            hasError ? "border-destructive ring-destructive/20" : ""
                                           )}
-                                        />
-                                      )}
-                                    </div>
-                                  );
-                                }}
-                              />
-                            </div>
-                          );
-                        })}
+                                        </div>
+                                      );
+                                    }}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </motion.div>
+                        </AnimatePresence>
                       </motion.div>
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-              </div>
+                    )}
+                  </div>
 
-              <div className="pt-4">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-12 text-lg font-bold bg-fire-gradient hover:opacity-90 transition-opacity"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      Enviar Solicitação
-                      <Send className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              </div>
+                  <div className="pt-4">
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full h-12 text-lg font-bold bg-fire-gradient hover:opacity-90 transition-opacity"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          Enviar Solicitação
+                          <Send className="ml-2 h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
             </form>
           </CardContent>
         </Card>

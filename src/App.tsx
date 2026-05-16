@@ -8,7 +8,7 @@ import FormPage from '@/pages/FormPage';
 import EnemCristao from '@/pages/EnemCristao';
 import AboutUs from '@/pages/AboutUs';
 import SchedulePage from '@/pages/SchedulePage';
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function App() {
   return (

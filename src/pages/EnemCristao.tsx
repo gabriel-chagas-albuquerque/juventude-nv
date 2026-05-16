@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   BookOpen, 
@@ -13,10 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { client } from '@/lib/sanityClient';
-import { ENEM_QUERY } from '@/lib/queries';
-import type { EnemCristao, EnemFeature } from '@/lib/types';
+import type { EnemFeature } from '@/lib/types';
 import { PortableText } from '@portabletext/react';
+import { useEnemCristao } from '@/hooks/useEnemCristao';
 
 const MEDAL_COLORS = [
   'from-yellow-400 to-yellow-600', // Gold
@@ -78,25 +76,7 @@ const itemVariants = {
 };
 
 export default function EnemCristaoPage() {
-  const [data, setData] = useState<EnemCristao | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const result = await client.fetch(ENEM_QUERY);
-        if (result) {
-          setData(result);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar dados do ENEM Cristão:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, []);
+  const { data, loading } = useEnemCristao();
 
   const features = data?.features && data.features.length > 0 ? data.features : FALLBACK_FEATURES;
 

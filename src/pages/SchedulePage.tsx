@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarDays, MapPin, Clock, Sparkles, ChevronRight } from 'lucide-react';
-import { client } from '@/lib/sanityClient';
-import { SCHEDULE_QUERY } from '@/lib/queries';
-import type { ScheduleItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import type { ScheduleItem } from '@/lib/types';
+import { useSchedule } from '@/hooks/useSchedule';
 
 const DAYS = [
   { id: '0', label: 'Domingo' },
@@ -26,18 +25,8 @@ const ORDINAL_LABELS: Record<string, string> = {
 };
 
 export default function SchedulePage() {
-  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: schedule, loading } = useSchedule();
   const [activeTab, setActiveTab] = useState<string>(new Date().getDay().toString());
-
-  useEffect(() => {
-    client.fetch(SCHEDULE_QUERY)
-      .then((data) => {
-        setSchedule(data);
-        setLoading(false);
-      })
-      .catch(() => {});
-  }, []);
 
   // Filter events for the active weekday
   const dailyEvents = schedule.filter(item => 
@@ -56,13 +45,18 @@ export default function SchedulePage() {
 
   const getRecurrenceTag = (item: ScheduleItem) => {
     if (item.tipoRecorrencia === 'mensal_ordinal') {
-      return `${ORDINAL_LABELS[item.ordemMensal || ''] || ''} ${DAYS.find(d => d.id === item.diaDaSemana)?.label}`;
+      const dayLabel = DAYS.find(d => d.id === item.diaDaSemana)?.label || '';
+      return `${ORDINAL_LABELS[item.ordemMensal || ''] || ''} ${dayLabel}`;
     }
     if (item.tipoRecorrencia === 'mensal_dia') {
-      return `Todo dia ${item.dataFixa ? new Date(item.dataFixa).getUTCDate() : ''}`;
+      const date = item.dataFixa ? new Date(item.dataFixa) : null;
+      return `Todo dia ${date && !isNaN(date.getTime()) ? date.getUTCDate() : ''}`;
     }
     if (item.tipoRecorrencia === 'unico') {
-      return item.dataFixa ? new Date(item.dataFixa).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'Data única';
+      const date = item.dataFixa ? new Date(item.dataFixa) : null;
+      return date && !isNaN(date.getTime()) 
+        ? date.toLocaleDateString('pt-BR', { timeZone: 'UTC' }) 
+        : 'Data única';
     }
     return 'Semanal';
   };

@@ -2,10 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { client } from '@/lib/sanityClient';
-import { SITE_SETTINGS_QUERY } from '@/lib/queries';
-import type { SiteSettings } from '@/lib/types';
-import { useEffect } from 'react';
+import { useSettings } from '@/contexts/SettingsContext';
 
 const navLinks = [
   { label: 'Início', to: '/' },
@@ -17,12 +14,8 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const { settings } = useSettings();
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    client.fetch<SiteSettings>(SITE_SETTINGS_QUERY).then(setSettings);
-  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -32,13 +25,13 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-9 h-9 rounded-full overflow-hidden border border-primary/20 glow-orange transition-all duration-300 group-hover:scale-110">
               <img 
-                src={settings?.home?.logoUrl || "/logo-juventude-nv.png"} 
+                src={settings?.home?.logoUrl || "/logo juventude-nv.png"} 
                 alt="Logo" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  if (target.src !== "/logo-juventude-nv.png") {
-                    target.src = "/logo-juventude-nv.png";
+                  if (target.src !== "/logo juventude-nv.png") {
+                    target.src = "/logo juventude-nv.png";
                   }
                 }}
               />

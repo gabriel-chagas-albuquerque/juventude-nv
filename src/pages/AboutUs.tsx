@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Target, Heart, Star, Flame, BookOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { client } from '@/lib/sanityClient';
-import { ABOUT_US_QUERY } from '@/lib/queries';
-import type { AboutUs as AboutUsType } from '@/lib/types';
+import { useAboutUs } from '@/hooks/useAboutUs';
 
 const iconMap: Record<string, LucideIcon> = {
   Users,
@@ -16,19 +13,7 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 export default function AboutUs() {
-  const [content, setContent] = useState<AboutUsType | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    client.fetch<AboutUsType>(ABOUT_US_QUERY)
-      .then((data) => {
-        setContent(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+  const { data: content, loading } = useAboutUs();
 
   if (loading) {
     return (

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { 
@@ -12,9 +11,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { client } from '@/lib/sanityClient';
-import { SITE_SETTINGS_QUERY } from '@/lib/queries';
-import type { SiteSettings } from '@/lib/types';
+import { useSettings } from '@/contexts/SettingsContext';
 
 const containerVariants = {
   hidden: { opacity: 0.5 },
@@ -62,15 +59,7 @@ const navCards = [
 ];
 
 export default function Home() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-
-  useEffect(() => {
-    client.fetch<SiteSettings>(SITE_SETTINGS_QUERY)
-      .then(setSettings)
-      .catch((err) => {
-        console.error("Erro ao carregar configurações:", err);
-      });
-  }, []);
+  const { settings } = useSettings();
 
   const home = settings?.home;
 
@@ -80,13 +69,17 @@ export default function Home() {
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
         {/* Cinematic background */}
         <div className="absolute inset-0 z-0">
-          {home?.heroImageUrl && (
-            <img
-              src={home.heroImageUrl}
-              alt="Background"
-              className="w-full h-full object-cover opacity-100"
-            />
-          )}
+          <img
+            src={home?.heroImageUrl || "/hero-juventude-nv.jpeg"}
+            alt="Background"
+            className="w-full h-full object-cover opacity-100"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== "/hero-juventude-nv.jpeg") {
+                target.src = "/hero-juventude-nv.jpeg";
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-black/50" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-background" />
         </div>
