@@ -1,25 +1,28 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Youtube, Phone } from 'lucide-react';
-import { client } from '@/lib/sanityClient';
-import { SITE_SETTINGS_QUERY } from '@/lib/queries';
-import type { SiteSettings } from '@/lib/types';
-import { useEffect, useState } from 'react';
+import { Instagram, Youtube, Phone, MapPin } from 'lucide-react';
+import { useSettings } from '@/contexts/SettingsContext';
 
 export default function Footer() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-
-  useEffect(() => {
-    client.fetch<SiteSettings>(SITE_SETTINGS_QUERY).then(setSettings);
-  }, []);
+  const { settings } = useSettings();
 
   return (
     <footer className="border-t border-border/50 bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex flex-col items-center md:items-start">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="flex flex-col items-center md:items-start space-y-6">
+            <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
-                <img src={settings?.home?.logoUrl || "/src/assets/logo.png"} alt="Logo" className="w-full h-full object-cover" />
+                <img 
+                  src={settings?.home?.logoUrl || "/logo juventude-nv.png"} 
+                  alt="Logo" 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== "/logo juventude-nv.png") {
+                      target.src = "/logo juventude-nv.png";
+                    }
+                  }}
+                />
               </div>
               <span className="font-bold text-xl tracking-tight">
                 <span className="text-foreground">{settings?.home?.title?.split(' ')[0] || "Juventude"}</span>{' '}
@@ -29,6 +32,14 @@ export default function Footer() {
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs text-center md:text-left">
               {settings?.home?.footerText || "Juventude da Igreja Assembleia de Deus Novo Viver. Transformando vidas pelo poder de Cristo e impactando gerações."}
             </p>
+            {settings?.home?.contactInfo?.address && (
+              <div className="flex items-start gap-3 text-muted-foreground text-sm group">
+                <MapPin className="w-5 h-5 text-primary shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="leading-relaxed">
+                  {settings.home.contactInfo.address}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Links */}
@@ -39,7 +50,7 @@ export default function Footer() {
                 { label: 'Início', to: '/' },
                 { label: 'Sobre nós', to: '/sobre-nos' },
                 { label: 'Programação/Eventos', to: '/programacao' },
-                { label: 'Fale Conosco', to: '/inscricao' },
+                { label: 'Fale Conosco', to: '/fale-conosco' },
                 { label: 'ENEM Cristão', to: '/enem-cristao' },
               ].map((link) => (
                 <li key={link.to}>
