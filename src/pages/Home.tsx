@@ -87,11 +87,10 @@ export default function Home() {
         <div className="relative z-10 max-w-6xl w-full mx-auto flex flex-col items-center">
           {/* Header Area */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center mb-6"
-            style={{ willChange: 'auto' }}
           >
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-6 text-center sm:text-left">
                 <img
@@ -186,16 +185,14 @@ export default function Home() {
         </div>
 
         {/* Footer Text / Organization Name */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
+        <div
           className="absolute bottom-8 left-0 right-0 text-center"
+          style={{ opacity: 1 }}
         >
           <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.4em] text-white/50">
             {home?.organizationName || "Assembleia de Deus Novo Viver"}
           </span>
-        </motion.div>
+        </div>
       </section>
     </div>
   );
