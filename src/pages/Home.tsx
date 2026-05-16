@@ -66,9 +66,9 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-hidden">
       {/* ── Hero Section ── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4 isolate overflow-clip">
         {/* Cinematic background */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 h-full z-0">
           <img
             src={home?.heroImageUrl || "/hero-juventude-nv.jpeg"}
             alt="Background"
