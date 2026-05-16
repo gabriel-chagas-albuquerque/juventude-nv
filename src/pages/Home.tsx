@@ -64,11 +64,11 @@ export default function Home() {
   const home = settings?.home;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* ── Hero Section ── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4 isolate overflow-clip">
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4">
         {/* Cinematic background */}
-        <div className="absolute inset-0 h-full z-0">
+        <div className="absolute inset-0 h-full z-0" style={{ willChange: 'auto' }}>
           <img
             src={home?.heroImageUrl || "/hero-juventude-nv.jpeg"}
             alt="Background"
@@ -91,6 +91,7 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center mb-6"
+            style={{ willChange: 'auto' }}
           >
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-6 text-center sm:text-left">
                 <img
