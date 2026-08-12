@@ -52,6 +52,34 @@ export default function FormPage() {
   const [submitError, setSubmitError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const formResolver = async (data: any, context: any, options: any) => {
+    let dynamicSchema: any = baseSchema;
+    
+    if (data.categoryId && categories.length > 0) {
+      const categoryObj = categories.find(c => c._id === data.categoryId);
+      const questions = categoryObj?.questions || [];
+      
+      if (questions.length > 0) {
+        const shape: any = {};
+        questions.forEach((q: any) => {
+          const fieldId = q.fieldName?.current || q.question.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+          if (q.required) {
+            if (q.fieldType === 'boolean') {
+              shape[fieldId] = z.boolean().refine(val => val === true, "Este campo é obrigatório");
+            } else if (q.fieldType === 'select' && q.allowMultiple) {
+              shape[fieldId] = z.array(z.string()).min(1, "Este campo é obrigatório");
+            } else {
+              shape[fieldId] = z.string().min(1, "Este campo é obrigatório");
+            }
+          }
+        });
+        dynamicSchema = baseSchema.extend(shape);
+      }
+    }
+    
+    return zodResolver(dynamicSchema)(data, context, options);
+  };
+
   const {
     register,
     handleSubmit,
@@ -61,7 +89,7 @@ export default function FormPage() {
     reset,
     setValue,
   } = useForm<any>({
-    resolver: zodResolver(baseSchema),
+    resolver: formResolver,
     defaultValues: {
       name: '',
       email: '',
